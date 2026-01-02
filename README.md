@@ -1,59 +1,120 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Residencia
+proyecto de residencia 
+>>>>>>> c5448460f27523c9c7dd346e2fee7c5f7540ab50
+# HortaView - Sistema de Monitoreo Agrícola
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistema de monitoreo agrícola avanzado desarrollado como proyecto de residencia profesional.
 
-## About Laravel
+## 🌱 Descripción
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+HortaView es una plataforma web integral para el monitoreo y gestión de sistemas de riego agrícola. Permite el seguimiento en tiempo real de condiciones del suelo, control de ciclos de siembra y análisis predictivo para optimizar el uso del agua en cultivos.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Características Principales
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Dashboard BI Interactivo**: Visualización de indicadores clave de salud de cultivos
+- **Monitoreo en Tiempo Real**: Seguimiento continuo de humedad del suelo y temperatura
+- **Gestión de Ciclos de Siembra**: Control completo de etapas de cultivo
+- **Alertas Predictivas**: Sistema inteligente de alertas de secado del suelo
+- **Análisis Histórico**: Comparativas de rendimiento entre diferentes ciclos
+- **Autenticación de Usuarios**: Sistema seguro de acceso basado en usuarios existentes
+- **Reportes Personalizados**: Exportación de datos en formato PDF
 
-## Learning Laravel
+## 🛠️ Tecnologías Utilizadas
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- **Backend**: Laravel 12 (PHP 8.3+)
+- **Frontend**: Blade Templates + Bootstrap 4
+- **Base de Datos**: MySQL
+- **Gráficos**: Chart.js
+- **Autenticación**: Laravel Breeze/Sanctum
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 📁 Estructura del Proyecto
 
-## Laravel Sponsors
+```
+app/
+├── Http/Controllers/
+│   ├── BiController.php          # Controlador principal de BI
+│   ├── AuthController.php        # Autenticación de usuarios
+│   └── PrediccionController.php  # Controlador de predicciones
+├── Models/
+│   ├── CamaSiembra.php           # Modelo de camas de siembra
+│   ├── Cama2.php                 # Modelo de segunda cama
+│   ├── CicloSiembra.php          # Modelo de ciclos de siembra
+│   ├── Cultivo.php               # Modelo de cultivos
+│   └── Valvula.php               # Modelo de válvulas de riego
+resources/
+└── views/
+    └── bi/
+        ├── dashboard.blade.php   # Dashboard principal
+        └── reporte_pdf.blade.php # Plantilla de reportes
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🔧 Instalación
 
-### Premium Partners
+1. Clonar el repositorio:
+```bash
+git clone https://github.com/Octavio-G/Residencia.git
+cd Residencia
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+2. Instalar dependencias de PHP:
+```bash
+composer install
+```
 
-## Contributing
+3. Configurar el entorno:
+```bash
+cp .env.example .env
+# Configurar las credenciales de base de datos en .env
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4. Generar clave de aplicación:
+```bash
+php artisan key:generate
+```
 
-## Code of Conduct
+5. Ejecutar migraciones:
+```bash
+php artisan migrate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+6. Iniciar el servidor de desarrollo:
+```bash
+php artisan serve
+```
 
-## Security Vulnerabilities
+## 📊 Módulos Disponibles
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 1. Indicador de Salud
+Panel de semáforo visual que muestra el estado de las camas de siembra con colores:
+- 🟢 Verde: Óptimo (60-100% humedad)
+- 🟡 Amarillo: Advertencia (30-59% humedad)
+- 🔴 Rojo: Crítico (<30% humedad)
 
-## License
+### 2. Alerta de Secado
+Sistema predictivo que estima tiempo restante antes de alcanzar niveles críticos de humedad del suelo.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 3. Análisis Histórico
+Comparativas entre ciclos de siembra con métricas de rendimiento.
+
+### 4. Gestión de Ciclos
+Control de días transcurridos, consumo de agua y estado de completitud de ciclos.
+
+## 👥 Autores
+
+Proyecto desarrollado como parte de las actividades de residencia profesional.
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+
+## 🤝 Contribuciones
+
+Las contribuciones son bienvenidas. Para cambios importantes, por favor abre un issue primero para discutir lo que te gustaría cambiar.
+
+---
+
+Desarrollado con ❤️ para la optimización de recursos agrícolas
+=======
+# Residencia
+proyecto de residencia 
+>>>>>>> c5448460f27523c9c7dd346e2fee7c5f7540ab50
