@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class TipoUsuario extends Model
+{
+    use HasFactory;
+
+    // Especificar la tabla existente
+    protected $table = 'tipo_usuario';
+
+    // Especificar la clave primaria
+    protected $primaryKey = 'id';
+
+    // Desactivar timestamps si no existen en la tabla
+    public $timestamps = false;
+
+    // Campos que pueden ser asignados masivamente
+    protected $fillable = [
+        'tipo_usuario_nombre',
+        'tipo_usuario_valor'
+    ];
+
+    // Relación con usuarios
+    public function usuarios()
+    {
+        return $this->hasMany(User::class, 'tipo_usuario_id', 'id');
+    }
+}
