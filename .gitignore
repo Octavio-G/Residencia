@@ -1,24 +1,130 @@
-*.log
-.DS_Store
+# Laravel specific files
 .env
 .env.backup
-.env.production
-.phpactor.json
 .phpunit.result.cache
-/.fleet
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/storage/pail
-/vendor
+docker-compose.override.yml
 Homestead.json
 Homestead.yaml
+npm-debug.log
+yarn-error.log
+.env.testing
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Laravel 4 specific
+bootstrap/compiled.php
+app/storage/
+
+# Laravel 5 & 6 specific
+storage/
+vendor/
+node_modules/
+database/factories/
+database/seeds/
+database/seeders/
+
+# Laravel 7 & up specific
+.bootstrap/cache/
+forge.svg
+
+# IDE files
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Sublime Text
+.sass-cache
+*.sublime-project
+*.sublime-workspace
+
+# PhpStorm
+.idea
+
+# NetBeans
+nbproject
+
+# Atom
+*.atom/
+
+# Mac OSX
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
 Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# Composer
+composer.phar
+/vendor/
+
+# Node
+/node_modules/
+npm-debug.log
+yarn-error.log
+.yarn-integrity
+
+# Testing
+.clover.xml
+.php_cs.cache
+.php_cs.dist.cache
+.phpunit.cache/
+.phpunit.result.cache
+coverage/
+.php_cs
+.php_cs.dist
+
+# Logs
+laravel.log
+*.log
+
+# SQL
+*.sql
+
+# Backup files
+*.bak
+*.backup
+
+# Temporary files
+tmp/
+temp/
+
+# Cache
+.cache/
+*.cache
+
+# Build artifacts
+dist/
+build/
+public/build/
+public/hot
+public/storage
+storage/*.key
+vendor/
+node_modules/
+.env
+.env.*
+!.env.example
