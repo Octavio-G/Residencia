@@ -92,6 +92,10 @@ class ComparativaController extends Controller
 
         // Debug: Verificar si hay cultivoIds
         Log::info('CultivoIds para ciclo ' . $ciclo->cicloId . ': ' . $cultivoIds->implode(','));
+        
+        // Las tablas cama1 y cama2 no tienen relación directa con cultivo
+        // Por lo tanto, solo podemos filtrar por fechas del ciclo
+        Log::info('Buscando datos de humedad para el ciclo ' . $ciclo->cicloId . ' en el rango: ' . $ciclo->fechaInicio . ' a ' . $ciclo->fechaFin);
 
         // Normalizar fechas para el eje X (Día del Ciclo)
         $fechaInicio = Carbon::parse($ciclo->fechaInicio);
@@ -102,6 +106,7 @@ class ComparativaController extends Controller
 
         if ($tipoDato === 'humedad' || $tipoDato === 'humedad_cama1' || $tipoDato === 'humedad_cama2') {
             // Para humedad, usamos las fechas del ciclo para filtrar datos
+            // Las tablas cama1 y cama2 no tienen relación directa con cultivo, solo filtramos por fechas
             $fechaActual = clone $fechaInicio;
             $dia = 1;
             
@@ -111,14 +116,16 @@ class ComparativaController extends Controller
                 $valorHumedad = 0;
                 
                 if ($tipoDato === 'humedad' || $tipoDato === 'humedad_cama1') {
-                    // Obtener humedad promedio de cama1 para esta fecha
+                    // Obtener humedad promedio de cama1 para esta fecha dentro del rango del ciclo
                     $humedadCama1 = CamaSiembra::whereDate('fecha', $fechaStr)
+                        ->whereBetween('fecha', [$ciclo->fechaInicio, $ciclo->fechaFin])
                         ->avg('humedad');
                 }
                 
                 if ($tipoDato === 'humedad' || $tipoDato === 'humedad_cama2') {
-                    // Obtener humedad promedio de cama2 para esta fecha
+                    // Obtener humedad promedio de cama2 para esta fecha dentro del rango del ciclo
                     $humedadCama2 = Cama2::whereDate('fecha', $fechaStr)
+                        ->whereBetween('fecha', [$ciclo->fechaInicio, $ciclo->fechaFin])
                         ->avg('humedad');
                 }
                 

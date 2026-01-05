@@ -27,6 +27,12 @@
                         <i class="fas fa-chart-line"></i> Comparativa Histórica
                     </a>
                 </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" id="indice-secado-tab" data-toggle="tab" href="#indice-secado" role="tab">
+                        <i class="fas fa-wind"></i> Índice de Secado
+                    </a>
+                </li>
             </ul>
             
             <!-- Contenido de las pestañas -->
@@ -371,7 +377,7 @@
                                 <select class="form-control" id="tipo_grafica" name="tipo_grafica">
                                     <option value="lineal">Lineal</option>
                                     <option value="barra">Barra</option>
-                                    <option value="pastel">Pastel</option>
+                                    <option value="radar">Radar</option>
                                 </select>
                             </div>
                             <div class="col-md-2">
@@ -385,7 +391,6 @@
                             <div class="col-md-4">
                                 <label for="tipo_dato">Tipo de Dato:</label>
                                 <select class="form-control" id="tipo_dato" name="tipo_dato">
-                                    <option value="humedad">Humedad Promedio (Cama 1 y 2)</option>
                                     <option value="humedad_cama1">Humedad Cama 1</option>
                                     <option value="humedad_cama2">Humedad Cama 2</option>
                                     <option value="consumo_agua">Consumo de Agua</option>
@@ -451,6 +456,92 @@
                                 </div>
                                 <div class="card-body text-center">
                                     <canvas id="graficoPastelCicloB" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pestaña 4: Índice de Secado -->
+    <div class="tab-pane fade" id="indice-secado" role="tabpanel">
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5>Índice de Secado</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <button class="btn btn-primary" id="btn-cargar-secado">
+                            <i class="fas fa-sync-alt"></i> Actualizar Datos
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Panel Cama 1 -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card border-primary">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-seedling"></i> 
+                                    <span id="cama1-nombre">Cama 1</span>
+                                    <small class="float-right">Cultivo: <span id="cama1-cultivo">Cargando...</span></small>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center mb-3">
+                                    <h3 id="cama1-tiempo-restante" class="text-success">
+                                        <i class="fas fa-clock"></i> Cargando...
+                                    </h3>
+                                    <div id="cama1-mensaje-estado" class="alert alert-info mt-2">
+                                        Cargando estado...
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <canvas id="grafica-cama1" height="200"></canvas>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <small class="text-muted">
+                                        Temperatura actual: <span id="cama1-temperatura">0°C</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel Cama 2 -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-seedling"></i> 
+                                    <span id="cama2-nombre">Cama 2</span>
+                                    <small class="float-right">Cultivo: <span id="cama2-cultivo">Cargando...</span></small>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="text-center mb-3">
+                                    <h3 id="cama2-tiempo-restante" class="text-success">
+                                        <i class="fas fa-clock"></i> Cargando...
+                                    </h3>
+                                    <div id="cama2-mensaje-estado" class="alert alert-info mt-2">
+                                        Cargando estado...
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <canvas id="grafica-cama2" height="200"></canvas>
+                                </div>
+                                
+                                <div class="text-center">
+                                    <small class="text-muted">
+                                        Temperatura actual: <span id="cama2-temperatura">0°C</span>
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -849,8 +940,8 @@
         });
     }
     
-    // Función para crear gráfica de pastel
-    function crearGraficaPastel(datosCicloA, datosCicloB, titulo, etiquetaCicloA, etiquetaCicloB) {
+    // Función para crear gráfica de radar
+    function crearGraficaRadar(datosCicloA, datosCicloB, titulo, etiquetaCicloA, etiquetaCicloB) {
         var ctx = document.getElementById('graficoComparativo').getContext('2d');
         
         // Destruir gráfica anterior si existe
@@ -858,29 +949,46 @@
             window.graficoComparativo.destroy();
         }
         
-        // Calcular totales
-        var totalA = datosCicloA.reduce((sum, item) => sum + item.valor, 0);
-        var totalB = datosCicloB.reduce((sum, item) => sum + item.valor, 0);
+        // Extraer labels y valores
+        var labels = datosCicloA.map(item => 'Día ' + item.dia);
+        var valoresCicloA = datosCicloA.map(item => item.valor);
+        var valoresCicloB = datosCicloB.map(item => item.valor);
         
         window.graficoComparativo = new Chart(ctx, {
-            type: 'pie',
+            type: 'radar',
             data: {
-                labels: [etiquetaCicloA, etiquetaCicloB],
-                datasets: [{
-                    data: [totalA, totalB],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.7)',
-                        'rgba(54, 162, 235, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgb(255, 99, 132)',
-                        'rgb(54, 162, 235)'
-                    ],
-                    borderWidth: 1
-                }]
+                labels: labels,
+                datasets: [
+                    {
+                        label: etiquetaCicloA,
+                        data: valoresCicloA,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        pointBackgroundColor: 'rgb(255, 99, 132)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(255, 99, 132)'
+                    },
+                    {
+                        label: etiquetaCicloB,
+                        data: valoresCicloB,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        pointBackgroundColor: 'rgb(54, 162, 235)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(54, 162, 235)'
+                    }
+                ]
             },
             options: {
                 responsive: true,
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: Math.max(...valoresCicloA, ...valoresCicloB) * 1.1 // Ajustar el máximo según los datos
+                    }
+                },
                 plugins: {
                     legend: {
                         position: 'top',
@@ -888,7 +996,7 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                var label = context.label || '';
+                                var label = context.dataset.label || '';
                                 if (label) {
                                     label += ': ';
                                 }
@@ -902,110 +1010,6 @@
                 }
             }
         });
-    }
-    
-    // Función para crear gráficas de pastel para distribución de riego
-    function crearGraficasPastelDistribucion(totalesCicloA, totalesCicloB) {
-        // Gráfica para Ciclo A
-        var ctxA = document.getElementById('graficoPastelCicloA').getContext('2d');
-        
-        // Destruir gráfica anterior si existe
-        if (window.graficoPastelCicloA) {
-            window.graficoPastelCicloA.destroy();
-        }
-        
-        window.graficoPastelCicloA = new Chart(ctxA, {
-            type: 'pie',
-            data: {
-                labels: ['Riego Manual', 'Válvula'],
-                datasets: [{
-                    data: [totalesCicloA.manual, totalesCicloA.valvula],
-                    backgroundColor: [
-                        'rgba(255, 159, 64, 0.7)',
-                        'rgba(75, 192, 192, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgb(255, 159, 64)',
-                        'rgb(75, 192, 192)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                var label = context.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed !== null) {
-                                    label += context.parsed.toFixed(2) + ' L';
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        
-        // Gráfica para Ciclo B
-        var ctxB = document.getElementById('graficoPastelCicloB').getContext('2d');
-        
-        // Destruir gráfica anterior si existe
-        if (window.graficoPastelCicloB) {
-            window.graficoPastelCicloB.destroy();
-        }
-        
-        window.graficoPastelCicloB = new Chart(ctxB, {
-            type: 'pie',
-            data: {
-                labels: ['Riego Manual', 'Válvula'],
-                datasets: [{
-                    data: [totalesCicloB.manual, totalesCicloB.valvula],
-                    backgroundColor: [
-                        'rgba(255, 159, 64, 0.7)',
-                        'rgba(75, 192, 192, 0.7)'
-                    ],
-                    borderColor: [
-                        'rgb(255, 159, 64)',
-                        'rgb(75, 192, 192)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                var label = context.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed !== null) {
-                                    label += context.parsed.toFixed(2) + ' L';
-                                }
-                                return label;
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        
-        // Mostrar contenedor de gráficas adicionales
-        $('#graficas_adicionales').show();
     }
     
     // Función para comparar ciclos
@@ -1075,33 +1079,8 @@
                     case 'barra':
                         crearGraficaBarras(response.ciclo_a.datos, response.ciclo_b.datos, titulo, etiquetaCicloA, etiquetaCicloB);
                         break;
-                    case 'pastel':
-                        // Para pastel, mostramos totales
-                        if (tipoDato === 'consumo_agua') {
-                            // Solicitar totales específicos para distribución
-                            $.ajax({
-                                url: '/bi/comparativa/totales',
-                                method: 'POST',
-                                data: {
-                                    ciclo_a: cicloA,
-                                    ciclo_b: cicloB,
-                                    _token: '{{ csrf_token() }}'
-                                },
-                                success: function(totalesResponse) {
-                                    crearGraficaPastel(response.ciclo_a.datos, response.ciclo_b.datos, titulo, etiquetaCicloA, etiquetaCicloB);
-                                    crearGraficasPastelDistribucion(
-                                        totalesResponse.ciclo_a.totales,
-                                        totalesResponse.ciclo_b.totales
-                                    );
-                                },
-                                error: function(xhr, status, error) {
-                                    console.log('Error al obtener totales:', xhr.responseText);
-                                    crearGraficaPastel(response.ciclo_a.datos, response.ciclo_b.datos, titulo, etiquetaCicloA, etiquetaCicloB);
-                                }
-                            });
-                        } else {
-                            crearGraficaPastel(response.ciclo_a.datos, response.ciclo_b.datos, titulo, etiquetaCicloA, etiquetaCicloB);
-                        }
+                    case 'radar':
+                        crearGraficaRadar(response.ciclo_a.datos, response.ciclo_b.datos, titulo, etiquetaCicloA, etiquetaCicloB);
                         break;
                 }
             },
@@ -1131,6 +1110,172 @@
     // Evento para activar pestaña de comparativa histórica
     $('#comparativa-historica-tab').on('shown.bs.tab', function (e) {
         cargarCiclosFinalizados();
+    });
+    
+    // Función para cargar datos del índice de secado
+    function cargarDatosSecado() {
+        $.ajax({
+            url: '/bi/indice-secado/calcular',
+            method: 'GET',
+            beforeSend: function() {
+                $('#btn-cargar-secado').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Cargando...');
+            },
+            success: function(data) {
+                // Actualizar Cama 1
+                $('#cama1-nombre').text(data.cama1.nombre);
+                $('#cama1-cultivo').text(data.cama1.cultivo);
+                $('#cama1-temperatura').text(data.cama1.temperatura_actual + '°C');
+                
+                // Formatear tiempo restante para Cama 1
+                let tiempoCama1 = '';
+                if (data.cama1.tiempo_restante.horas > 0) {
+                    tiempoCama1 = data.cama1.tiempo_restante.horas + 'h ';
+                }
+                tiempoCama1 += data.cama1.tiempo_restante.minutos + 'm';
+                
+                $('#cama1-tiempo-restante').text(tiempoCama1);
+                
+                // Actualizar estado para Cama 1
+                let mensajeEstado1 = data.cama1.mensaje_estado;
+                let claseEstado1 = 'alert-info';
+                
+                if (mensajeEstado1.includes('CRÍTICO')) {
+                    claseEstado1 = 'alert-danger';
+                    $('#cama1-tiempo-restante').removeClass('text-success text-danger').addClass('text-white blink');
+                } else if (mensajeEstado1.includes('URGENTE')) {
+                    claseEstado1 = 'alert-warning';
+                    $('#cama1-tiempo-restante').removeClass('text-white text-success').addClass('text-danger');
+                } else {
+                    $('#cama1-tiempo-restante').removeClass('text-white text-danger').addClass('text-success');
+                }
+                
+                $('#cama1-mensaje-estado').removeClass('alert-info alert-warning alert-danger').addClass(claseEstado1).text(mensajeEstado1);
+                
+                // Actualizar Cama 2
+                $('#cama2-nombre').text(data.cama2.nombre);
+                $('#cama2-cultivo').text(data.cama2.cultivo);
+                $('#cama2-temperatura').text(data.cama2.temperatura_actual + '°C');
+                
+                // Formatear tiempo restante para Cama 2
+                let tiempoCama2 = '';
+                if (data.cama2.tiempo_restante.horas > 0) {
+                    tiempoCama2 = data.cama2.tiempo_restante.horas + 'h ';
+                }
+                tiempoCama2 += data.cama2.tiempo_restante.minutos + 'm';
+                
+                $('#cama2-tiempo-restante').text(tiempoCama2);
+                
+                // Actualizar estado para Cama 2
+                let mensajeEstado2 = data.cama2.mensaje_estado;
+                let claseEstado2 = 'alert-info';
+                
+                if (mensajeEstado2.includes('CRÍTICO')) {
+                    claseEstado2 = 'alert-danger';
+                    $('#cama2-tiempo-restante').removeClass('text-success text-danger').addClass('text-white blink');
+                } else if (mensajeEstado2.includes('URGENTE')) {
+                    claseEstado2 = 'alert-warning';
+                    $('#cama2-tiempo-restante').removeClass('text-white text-success').addClass('text-danger');
+                } else {
+                    $('#cama2-tiempo-restante').removeClass('text-white text-danger').addClass('text-success');
+                }
+                
+                $('#cama2-mensaje-estado').removeClass('alert-info alert-warning alert-danger').addClass(claseEstado2).text(mensajeEstado2);
+                
+                // Dibujar gráficas
+                dibujarGrafica('grafica-cama1', data.cama1.lecturas_historial, data.cama1.nombre);
+                dibujarGrafica('grafica-cama2', data.cama2.lecturas_historial, data.cama2.nombre);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al cargar datos de secado:', error);
+                alert('Error al cargar los datos de secado');
+            },
+            complete: function() {
+                $('#btn-cargar-secado').prop('disabled', false).html('<i class="fas fa-sync-alt"></i> Actualizar Datos');
+            }
+        });
+    }
+    
+    // Función para dibujar gráficas de índice de secado
+    function dibujarGrafica(canvasId, lecturas, nombreCama) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        
+        // Destruir gráfica anterior si existe
+        if (window[canvasId + '_chart']) {
+            window[canvasId + '_chart'].destroy();
+        }
+        
+        // Preparar datos
+        const labels = lecturas.map(lectura => lectura.fecha + ' ' + lectura.hora);
+        const data = lecturas.map(lectura => lectura.humedad);
+        
+        // Configurar datasets
+        const datasets = [
+            {
+                label: 'Humedad (%)',
+                data: data,
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.1
+            },
+            {
+                label: 'Umbral Crítico (30%)',
+                data: Array(labels.length).fill(30),
+                borderColor: 'rgb(255, 99, 132)',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                pointRadius: 0
+            }
+        ];
+        
+        // Crear gráfica
+        window[canvasId + '_chart'] = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Humedad (%)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Fecha y Hora'
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Evento para activar pestaña de índice de secado
+    $('#indice-secado-tab').on('shown.bs.tab', function (e) {
+        cargarDatosSecado();
+    });
+    
+    // Evento para botón de carga de índice de secado
+    $('#btn-cargar-secado').click(function() {
+        cargarDatosSecado();
     });
     
     // Script de limpieza forzada para pestañas

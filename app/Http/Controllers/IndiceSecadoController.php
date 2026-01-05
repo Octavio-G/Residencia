@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\CamaSiembra;
 use App\Models\Cama2;
 use App\Models\Temperatura;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class IndiceSecadoController extends Controller
@@ -18,180 +18,100 @@ class IndiceSecadoController extends Controller
 
     public function calcularIndiceSecado()
     {
-        try {
-            // Obtener datos de ambas camas
-            $cama1 = $this->calcularDatosCama(CamaSiembra::class, 'cama1');
-            $cama2 = $this->calcularDatosCama(Cama2::class, 'cama2');
+        // Obtener los datos más recientes para ambas camas
+        $cama1 = $this->calcularDatosCama(CamaSiembra::class, 'Cama 1');
+        $cama2 = $this->calcularDatosCama(Cama2::class, 'Cama 2');
 
-            return response()->json([
-                'cama1' => $cama1,
-                'cama2' => $cama2
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Error en calcularIndiceSecado: ' . $e->getMessage());
-            return response()->json(['error' => 'Error al calcular el índice de secado'], 500);
-        }
+        return response()->json([
+            'cama1' => $cama1,
+            'cama2' => $cama2
+        ]);
     }
 
     private function calcularDatosCama($modelo, $nombreCama)
     {
-        $umbralCritico = 30.0;
-        
-        // Obtener las últimas 15 lecturas para el historial
+        // Obtener las últimas 10 lecturas de humedad para mostrar en la gráfica
         $lecturas = $modelo::orderBy('fecha', 'desc')
             ->orderBy('hora', 'desc')
-            ->limit(15)
-            ->get(['humedad', 'fecha', 'hora'])
+            ->limit(10)
+            ->get()
             ->map(function ($lectura) {
-                // Formatear la fecha para que sea más legible
-                $fechaFormateada = $lectura->fecha;
-                if (is_string($lectura->fecha)) {
-                    $fechaCarbon = \Carbon\Carbon::parse($lectura->fecha);
-                    $fechaFormateada = $fechaCarbon->format('Y-m-d');
-                }
                 return [
-                    'humedad' => $lectura->humedad,
-                    'fecha' => $fechaFormateada,
-                    'hora' => $lectura->hora
+                    'fecha' => $lectura->fecha,
+                    'hora' => $lectura->hora,
+                    'humedad' => $lectura->humedad
                 ];
             })
-            ->reverse() // Invertir para tener las más recientes al final
-            ->toArray();
+            ->reverse() // Para mostrar en orden cronológico
+            ->values();
 
-        if (empty($lecturas)) {
-            return [
-                'nombre' => ucfirst($nombreCama),
-                'tiempo_restante' => 0,
-                'humedad_actual' => 0,
-                'temperatura_actual' => 0,
-                'lecturas_historial' => [],
-                'cultivo' => 'No asignado',
-                'mensaje_estado' => 'Sin datos disponibles'
-            ];
-        }
-
-        // Obtener humedad actual (última lectura)
-        $ultimaLectura = end($lecturas);
-        $humedadActual = $ultimaLectura['humedad'];
-        $fechaActual = $ultimaLectura['fecha'];
-
-        // Obtener temperatura actual más cercana a la fecha de la última lectura
-        $temperaturaActual = $this->obtenerTemperaturaCercana($fechaActual);
-
-        // Obtener las últimas 5 lecturas para calcular la velocidad
-        $ultimas5 = array_slice($lecturas, -5);
-        
-        if (count($ultimas5) < 2) {
-            $velocidad = 0;
-        } else {
-            $velocidad = 0;
-            $anterior = null;
-            
-            foreach ($ultimas5 as $lectura) {
-                if ($anterior !== null) {
-                    // Calcular diferencia de humedad y tiempo
-                    $diferenciaHumedad = $anterior['humedad'] - $lectura['humedad'];
-                    
-                    // Convertir fechas a timestamps para calcular diferencia en minutos
-                    $fechaAnterior = strtotime($anterior['fecha'] . ' ' . $anterior['hora']);
-                    $fechaActualLectura = strtotime($lectura['fecha'] . ' ' . $lectura['hora']);
-                    
-                    if ($fechaActualLectura > $fechaAnterior) {
-                        $diferenciaMinutos = ($fechaActualLectura - $fechaAnterior) / 60;
-                        if ($diferenciaMinutos > 0) {
-                            $velocidad += $diferenciaHumedad / $diferenciaMinutos;
-                        }
-                    }
-                }
-                $anterior = $lectura;
-            }
-            
-            $velocidad = $velocidad / (count($ultimas5) - 1);
-        }
-
-        // Ajuste térmico
-        if ($temperaturaActual > 30) {
-            $velocidad *= 1.2;
-        }
-
-        // Cálculo final
-        if ($humedadActual <= $umbralCritico || $velocidad <= 0) {
-            $minutosRestantes = 0;
-        } else {
-            $minutosRestantes = ($humedadActual - $umbralCritico) / $velocidad;
-        }
-
-        // Asegurar que no sea negativo
-        $minutosRestantes = max(0, $minutosRestantes);
-
-        // Obtener información del cultivo
-        $ultimaCama = $modelo::orderBy('fecha', 'desc')
+        // Obtener la lectura más reciente
+        $lecturaReciente = $modelo::orderBy('fecha', 'desc')
             ->orderBy('hora', 'desc')
             ->first();
-        
-        $cultivo = $ultimaCama ? $ultimaCama->cultivo : 'No asignado';
 
-        // Formatear tiempo restante
-        $horas = floor($minutosRestantes / 60);
-        $minutos = round($minutosRestantes % 60);
-
-        // Preparar datos para historial
-        $lecturasHistorial = [];
-        foreach ($lecturas as $lectura) {
-            $lecturasHistorial[] = [
-                'fecha' => $lectura['fecha'],
-                'hora' => $lectura['hora'],
-                'humedad' => $lectura['humedad']
-            ];
+        // Obtener la temperatura más reciente cercana a la fecha de la lectura
+        $temperatura = 0;
+        if ($lecturaReciente) {
+            $temperatura = $this->obtenerTemperaturaCercana($lecturaReciente->fecha);
         }
 
+        // Calcular el tiempo estimado hasta que la humedad alcance niveles críticos
+        // Suponiendo una tasa de secado promedio (esto es una simplificación)
+        $humedadActual = $lecturaReciente ? $lecturaReciente->humedad : 0;
+        $minutosRestantes = $this->calcularMinutosHastaSecado($humedadActual);
+
+        // Determinar mensaje de estado
+        $mensajeEstado = $this->obtenerMensajeEstado($humedadActual, $minutosRestantes);
+
         return [
-            'nombre' => ucfirst($nombreCama),
-            'tiempo_restante' => [
-                'horas' => $horas,
-                'minutos' => $minutos
-            ],
+            'nombre' => $nombreCama,
+            'cultivo' => 'Tomate', // Placeholder - debería obtenerse del modelo real
             'humedad_actual' => $humedadActual,
-            'temperatura_actual' => $temperaturaActual,
-            'lecturas_historial' => $lecturasHistorial,
-            'cultivo' => $cultivo,
-            'mensaje_estado' => $this->obtenerMensajeEstado($humedadActual, $minutosRestantes)
+            'temperatura_actual' => $temperatura,
+            'tiempo_restante' => [
+                'horas' => intval($minutosRestantes / 60),
+                'minutos' => $minutosRestantes % 60
+            ],
+            'mensaje_estado' => $mensajeEstado,
+            'lecturas_historial' => $lecturas
         ];
     }
 
     private function obtenerTemperaturaCercana($fecha)
     {
-        // Asegurarse de que la fecha esté en formato correcto
-        if (strpos($fecha, 'T') !== false) {
-            $fecha = substr($fecha, 0, 10); // Extraer solo la parte de la fecha
-        }
-
-        // Buscar temperatura más cercana a la fecha dada
+        // Buscar temperatura registrada cerca de la fecha especificada
         $temperatura = Temperatura::whereDate('fecha', $fecha)
             ->orderBy('hora', 'desc')
             ->first();
 
-        if ($temperatura) {
-            return $temperatura->temperatura ?? 0;
+        return $temperatura ? $temperatura->temperatura : 25; // Valor por defecto
+    }
+
+    private function calcularMinutosHastaSecado($humedadActual)
+    {
+        // Simplificación: asumimos que la humedad disminuye a una tasa constante
+        // En una implementación real, esto dependería de múltiples factores
+        if ($humedadActual <= 30) {
+            return 0; // Ya está en nivel crítico
         }
 
-        // Si no hay temperatura para esa fecha, buscar en días cercanos
-        $temperatura = Temperatura::whereDate('fecha', '<=', $fecha)
-            ->orderBy('fecha', 'desc')
-            ->orderBy('hora', 'desc')
-            ->first();
+        // Asumiendo que la humedad disminuye 1% cada 2 horas en condiciones normales
+        $tasaSecado = 0.5; // % por hora
+        $humedadADisminuir = $humedadActual - 30; // Hasta el nivel crítico
+        $horasHastaSecado = $humedadADisminuir / $tasaSecado;
 
-        return $temperatura ? $temperatura->temperatura : 0;
+        return intval($horasHastaSecado * 60); // Convertir a minutos
     }
 
     private function obtenerMensajeEstado($humedadActual, $minutosRestantes)
     {
         if ($humedadActual <= 30) {
-            return '¡ESTRÉS CRÍTICO!';
-        } elseif ($minutosRestantes < 120) { // Menos de 2 horas
-            return '¡ATENCIÓN URGENTE!';
+            return "CRÍTICO: Humedad por debajo del 30%";
+        } elseif ($humedadActual <= 50) {
+            return "URGENTE: Riego recomendado pronto";
         } else {
-            return 'ESTADO NORMAL';
+            return "NORMAL: Niveles de humedad adecuados";
         }
     }
 }
