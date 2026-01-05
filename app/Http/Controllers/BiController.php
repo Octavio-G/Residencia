@@ -177,10 +177,140 @@ class BiController extends Controller
         
         // Calcular volumen total de agua usado en la tabla valvula durante el periodo del ciclo
         $volumenTotal = Valvula::whereIn('cultivoId', $cultivoIds)
+            ->whereBetween('fechaEncendido', [$ciclo->fechaInicio, $ciclo->fechaFin])
             ->sum('volumen');
         
-        // Obtener también el volumen por fecha para mostrar en gráfico
-        $volumenPorFecha = Valvula::whereIn('cultivoId', $cultivoIds)
+        // Si no hay datos en el periodo exacto, buscar en rango ampliado
+        if ($volumenTotal == 0) {
+            $fechaInicioAmpliada = date('Y-m-d H:i:s', strtotime($ciclo->fechaInicio . ' -30 days'));
+            $fechaFinAmpliada = date('Y-m-d H:i:s', strtotime($ciclo->fechaFin . ' +30 days'));
+            
+            $volumenTotal = Valvula::whereIn('cultivoId', $cultivoIds)
+                ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                ->sum('volumen');
+            
+            // Usar el rango ampliado para el gráfico también
+            $volumenPorFecha = Valvula::whereIn('cultivoId', $cultivoIds)
+                ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                ->selectRaw('DATE(fechaEncendido) as fecha, SUM(volumen) as volumen')
+                ->groupBy('fecha')
+                ->orderBy('fecha')
+                ->get();
+        } else {
+            // Obtener también el volumen por fecha para mostrar en gráfico
+            $volumenPorFecha = Valvula::whereIn('cultivoId', $cultivoIds)
+                ->whereBetween('fechaEncendido', [$ciclo->fechaInicio, $ciclo->fechaFin])
+                ->selectRaw('DATE(fechaEncendido) as fecha, SUM(volumen) as volumen')
+                ->groupBy('fecha')
+                ->orderBy('fecha')
+                ->get();
+        }
+        
+        return response()->json([
+            'volumen_total' => $volumenTotal,
+            'volumen_por_fecha' => $volumenPorFecha,
+            'fecha_inicio' => $ciclo->fechaInicio,
+            'fecha_fin' => $ciclo->fechaFin,
+            'ciclo_descripcion' => $ciclo->descripcion
+        ]);
+    }
+
+    /**
+     * Función de prueba para verificar volumen de agua - PANEL DE PRUEBA
+     */
+    public function testVolumenPanel(Request $request)
+    {
+        $cicloId = $request->input('ciclo_id');
+        
+        // Obtener el ciclo
+        $ciclo = CicloSiembra::where('cicloId', $cicloId)->first();
+        if (!$ciclo) {
+            return response()->json(['error' => 'Ciclo no encontrado'], 404);
+        }
+        
+        // Obtener cultivos
+        $cultivoIds = Cultivo::where('cicloId', $cicloId)->pluck('cultivoId');
+        
+        // Calcular volúmenes con información detallada
+        $volumenValvula = Valvula::whereIn('cultivoId', $cultivoIds)
+            ->whereBetween('fechaEncendido', [$ciclo->fechaInicio, $ciclo->fechaFin])
+            ->sum('volumen');
+            
+        $volumenRiegoManual = RiegoManual::whereIn('cultivoId', $cultivoIds)
+            ->whereBetween('fechaEncendido', [$ciclo->fechaInicio, $ciclo->fechaFin])
+            ->sum('volumen');
+            
+        $consumoTotal = $volumenValvula + $volumenRiegoManual;
+        
+        // Información de depuración
+        $registrosValvula = Valvula::whereIn('cultivoId', $cultivoIds)
+            ->whereBetween('fechaEncendido', [$ciclo->fechaInicio, $ciclo->fechaFin])
+            ->count();
+            
+        $registrosRiego = RiegoManual::whereIn('cultivoId', $cultivoIds)
+            ->whereBetween('fechaEncendido', [$ciclo->fechaInicio, $ciclo->fechaFin])
+            ->count();
+        
+        return response()->json([
+            'ciclo_id' => $cicloId,
+            'ciclo_descripcion' => $ciclo->descripcion,
+            'periodo' => [
+                'inicio' => $ciclo->fechaInicio,
+                'fin' => $ciclo->fechaFin
+            ],
+            'resultados' => [
+                'volumen_valvula' => round($volumenValvula, 2),
+                'volumen_riego_manual' => round($volumenRiegoManual, 2),
+                'consumo_total' => round($consumoTotal, 2)
+            ],
+            'detalles' => [
+                'registros_valvula' => $registrosValvula,
+                'registros_riego_manual' => $registrosRiego,
+                'cultivos_encontrados' => $cultivoIds->count()
+            ],
+            'mensaje' => 'Datos obtenidos correctamente'
+        ]);
+    }
+
+    /**
+     * Obtener volumen de agua usado en válvulas durante un ciclo de siembra
+     */
+    public function volumenAguaValvulaCiclo(Request $request)
+    {
+        $cicloId = $request->input('ciclo_id');
+        $ciclo = CicloSiembra::where('cicloId', $cicloId)->first();
+        
+        if (!$ciclo) { return response()->json(['error' => 'Ciclo no encontrado'], 404); }
+        
+        $cultivoIds = Cultivo::where('cicloId', $cicloId)->pluck('cultivoId');
+
+        // --- AQUÍ ESTÁ EL ARREGLO ---
+        // Forzar inicio a las 00:00:00 y fin a las 23:59:59
+        $fechaInicio = Carbon::parse($ciclo->fechaInicio)->startOfDay();
+        $fechaFin = Carbon::parse($ciclo->fechaFin)->endOfDay();
+
+        // 1. INTENTO ESTRICTO (Por Cultivo y Fechas)
+        $volumenTotal = Valvula::whereIn('cultivoId', $cultivoIds)
+            ->whereBetween('fechaEncendido', [$fechaInicio, $fechaFin])
+            ->sum('volumen');
+        
+        // 2. INTENTO POR FECHAS (Fallback si el estricto falló)
+        // Asumimos que si hubo riego en esas fechas, pertenece al ciclo activo
+        if ($volumenTotal == 0) {
+            Log::info("Intento estricto dio 0. Buscando solo por fechas: $fechaInicio a $fechaFin");
+            
+            $volumenTotal = Valvula::whereBetween('fechaEncendido', [$fechaInicio, $fechaFin])
+                ->sum('volumen');
+        }
+        
+        // Preparar datos para gráfica (usando la misma lógica de fallback)
+        $queryGrafica = Valvula::whereBetween('fechaEncendido', [$fechaInicio, $fechaFin]);
+        if ($volumenTotal > 0 && Valvula::whereIn('cultivoId', $cultivoIds)->exists()) {
+             // Si el filtro de cultivo funcionó, úsalo también para la gráfica
+             $queryGrafica->whereIn('cultivoId', $cultivoIds);
+        }
+        
+        $volumenPorFecha = $queryGrafica
             ->selectRaw('DATE(fechaEncendido) as fecha, SUM(volumen) as volumen')
             ->groupBy('fecha')
             ->orderBy('fecha')
@@ -211,16 +341,41 @@ class BiController extends Controller
         // Obtener IDs de cultivos asociados al ciclo
         $cultivoIds = Cultivo::where('cicloId', $cicloId)->pluck('cultivoId');
         
+        // --- AQUÍ ESTÁ EL ARREGLO ---
+        // Forzar inicio a las 00:00:00 y fin a las 23:59:59
+        $fechaInicio = Carbon::parse($ciclo->fechaInicio)->startOfDay();
+        $fechaFin = Carbon::parse($ciclo->fechaFin)->endOfDay();
+
         // Calcular volumen total de agua usado en la tabla riegomanual durante el periodo del ciclo
         $volumenTotal = RiegoManual::whereIn('cultivoId', $cultivoIds)
+            ->whereBetween('fechaEncendido', [$fechaInicio, $fechaFin])
             ->sum('volumen');
         
-        // Obtener también el volumen por fecha para mostrar en gráfico
-        $volumenPorFecha = RiegoManual::whereIn('cultivoId', $cultivoIds)
-            ->selectRaw('DATE(fechaEncendido) as fecha, SUM(volumen) as volumen')
-            ->groupBy('fecha')
-            ->orderBy('fecha')
-            ->get();
+        // Si no hay datos en el periodo exacto, buscar en rango ampliado
+        if ($volumenTotal == 0) {
+            $fechaInicioAmpliada = $fechaInicio->copy()->subDays(30);
+            $fechaFinAmpliada = $fechaFin->copy()->addDays(30);
+            
+            $volumenTotal = RiegoManual::whereIn('cultivoId', $cultivoIds)
+                ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                ->sum('volumen');
+            
+            // Usar el rango ampliado para el gráfico también
+            $volumenPorFecha = RiegoManual::whereIn('cultivoId', $cultivoIds)
+                ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                ->selectRaw('DATE(fechaEncendido) as fecha, SUM(volumen) as volumen')
+                ->groupBy('fecha')
+                ->orderBy('fecha')
+                ->get();
+        } else {
+            // Obtener también el volumen por fecha para mostrar en gráfico
+            $volumenPorFecha = RiegoManual::whereIn('cultivoId', $cultivoIds)
+                ->whereBetween('fechaEncendido', [$ciclo->fechaInicio, $ciclo->fechaFin])
+                ->selectRaw('DATE(fechaEncendido) as fecha, SUM(volumen) as volumen')
+                ->groupBy('fecha')
+                ->orderBy('fecha')
+                ->get();
+        }
         
         return response()->json([
             'volumen_total' => $volumenTotal,
@@ -344,9 +499,36 @@ class BiController extends Controller
         // Obtener IDs de cultivos asociados al ciclo
         $cultivoIds = Cultivo::where('cicloId', $cicloIdReal)->pluck('cultivoId');
         
-        // Calcular consumo de agua total
-        $volumenValvula = Valvula::whereIn('cultivoId', $cultivoIds)->sum('volumen');
-        $volumenRiegoManual = RiegoManual::whereIn('cultivoId', $cultivoIds)->sum('volumen');
+        // Calcular consumo de agua total DURANTE EL PERIODO DEL CICLO
+        // Primero intentar con el periodo exacto del ciclo
+        
+        // --- AQUÍ ESTÁ EL ARREGLO ---
+        // Forzar inicio a las 00:00:00 y fin a las 23:59:59
+        $fechaInicioPeriodo = Carbon::parse($ciclo->fechaInicio)->startOfDay();
+        $fechaFinPeriodo = Carbon::parse($ciclo->fechaFin)->endOfDay();
+        
+        $volumenValvula = Valvula::whereIn('cultivoId', $cultivoIds)
+            ->whereBetween('fechaEncendido', [$fechaInicioPeriodo, $fechaFinPeriodo])
+            ->sum('volumen');
+        
+        $volumenRiegoManual = RiegoManual::whereIn('cultivoId', $cultivoIds)
+            ->whereBetween('fechaEncendido', [$fechaInicioPeriodo, $fechaFinPeriodo])
+            ->sum('volumen');
+        
+        // Si no hay datos en el periodo exacto, buscar en un rango ampliado (±30 días)
+        if ($volumenValvula == 0 && $volumenRiegoManual == 0) {
+            $fechaInicioAmpliada = date('Y-m-d H:i:s', strtotime($ciclo->fechaInicio . ' -30 days'));
+            $fechaFinAmpliada = date('Y-m-d H:i:s', strtotime($ciclo->fechaFin . ' +30 days'));
+            
+            $volumenValvula = Valvula::whereIn('cultivoId', $cultivoIds)
+                ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                ->sum('volumen');
+            
+            $volumenRiegoManual = RiegoManual::whereIn('cultivoId', $cultivoIds)
+                ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                ->sum('volumen');
+        }
+        
         $consumoAguaTotal = $volumenValvula + $volumenRiegoManual;
         
         return response()->json([

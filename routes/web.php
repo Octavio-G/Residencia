@@ -30,7 +30,9 @@ Route::middleware('auth')->group(function () {
         // Route::get('/prediccion-secado', [PrediccionController::class, 'prediccionSecado'])->name('bi.prediccion-secado');
         Route::get('/ciclos-siembra', [BiController::class, 'ciclosSiembra'])->name('bi.ciclos-siembra');
         Route::post('/volumen-agua-ciclo', [BiController::class, 'volumenAguaCiclo'])->name('bi.volumen-agua-ciclo');
+        Route::post('/volumen-agua-valvula-ciclo', [BiController::class, 'volumenAguaValvulaCiclo'])->name('bi.volumen-agua-valvula-ciclo');
         Route::post('/volumen-agua-riego-manual-ciclo', [BiController::class, 'volumenAguaRiegoManualCiclo'])->name('bi.volumen-agua-riego-manual-ciclo');
+        Route::post('/test-volumen-panel', [BiController::class, 'testVolumenPanel'])->name('bi.test-volumen-panel');
         Route::post('/datos-ciclo', [BiController::class, 'datosCiclo'])->name('bi.datos-ciclo');
         Route::post('/comparar-ciclos', [BiController::class, 'compararCiclos'])->name('bi.comparar-ciclos');
         Route::get('/exportar-pdf', [BiController::class, 'exportarPdf'])->name('bi.exportar-pdf');
@@ -39,6 +41,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/comparativa', [ComparativaController::class, 'index'])->name('bi.comparativa');
         Route::get('/comparativa/ciclos-finalizados', [ComparativaController::class, 'getCiclosFinalizados']);
         Route::post('/comparativa/comparar', [ComparativaController::class, 'compararCiclos']);
+        Route::post('/comparativa/totales', [ComparativaController::class, 'getTotalesCiclos']);
         
         // Rutas para predicciones
         Route::get('/predicciones', [PrediccionController::class, 'index']);

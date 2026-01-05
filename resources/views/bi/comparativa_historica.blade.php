@@ -1,291 +1,272 @@
 @extends('layouts.app')
 
+@section('title', 'Comparativa Histórica')
+
 @section('content')
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-md-12">
-            <h1 class="mt-4">Comparativa Histórica de Ciclos</h1>
-            <p class="mb-4">Compare dos ciclos de siembra finalizados lado a lado</p>
-            
-            <!-- Panel de Filtros -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5>Filtros de Comparación</h5>
+    <h1 class="h3 mb-4 text-gray-800">Comparativa Histórica de Ciclos de Siembra</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Filtros de Comparación</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="ciclo_a">Ciclo A:</label>
+                    <select class="form-control" id="ciclo_a" name="ciclo_a">
+                        <option value="">Seleccione un ciclo</option>
+                        <!-- Opciones se cargarán dinámicamente -->
+                    </select>
                 </div>
-                <div class="card-body">
-                    <form id="form-comparativa">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label for="ciclo_a">Ciclo A:</label>
-                                <select class="form-control" id="ciclo_a" name="ciclo_a" required>
-                                    <option value="">Seleccione ciclo A</option>
-                                </select>
-                            </div>
-                            
-                            <div class="col-md-3">
-                                <label for="ciclo_b">Ciclo B:</label>
-                                <select class="form-control" id="ciclo_b" name="ciclo_b" required>
-                                    <option value="">Seleccione ciclo B</option>
-                                </select>
-                            </div>
-                            
-                            <div class="col-md-2">
-                                <label for="tipo_dato">Tipo de Dato:</label>
-                                <select class="form-control" id="tipo_dato" name="tipo_dato">
-                                    <option value="humedad_cama1">Humedad Cama 1</option>
-                                    <option value="humedad_cama2">Humedad Cama 2</option>
-                                    <option value="consumo_agua">Consumo Agua</option>
-                                </select>
-                            </div>
-                            
-                            <div class="col-md-2" id="div_tipo_riego" style="display: none;">
-                                <label for="tipo_riego">Tipo de Riego:</label>
-                                <select class="form-control" id="tipo_riego" name="tipo_riego">
-                                    <option value="manual">Riego Manual</option>
-                                    <option value="valvula">Válvula</option>
-                                    <option value="total">Total (Ambos)</option>
-                                </select>
-                            </div>
-                            
-                            <div class="col-md-2">
-                                <label>&nbsp;</label>
-                                <div>
-                                    <button type="submit" class="btn btn-primary btn-block">
-                                        <i class="fas fa-chart-line"></i> Comparar
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
+                <div class="col-md-4">
+                    <label for="ciclo_b">Ciclo B:</label>
+                    <select class="form-control" id="ciclo_b" name="ciclo_b">
+                        <option value="">Seleccione un ciclo</option>
+                        <!-- Opciones se cargarán dinámicamente -->
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="tipo_grafica">Tipo de Gráfica:</label>
+                    <select class="form-control" id="tipo_grafica" name="tipo_grafica">
+                        <option value="lineal">Lineal</option>
+                        <option value="barra">Barra</option>
+                        <option value="pastel">Pastel</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label>&nbsp;</label>
+                    <button type="button" class="btn btn-primary form-control" id="btn-comparar-completo">
+                        <i class="fas fa-sync-alt"></i> Comparar
+                    </button>
                 </div>
             </div>
-            
-            <!-- Panel de Resultados -->
-            <div id="panel-resultados" style="display: none;">
-                <div class="row mb-4">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 id="titulo-comparativa">Resultados de Comparación</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h6 id="info-ciclo-a"></h6>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h6 id="info-ciclo-b"></h6>
-                                    </div>
-                                </div>
-                                
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
-                                        <canvas id="grafica-comparativa" height="100"></canvas>
-                                    </div>
-                                </div>
-                                
-                                <div class="row mt-4" id="panel-estadisticas" style="display: none;">
-                                    <div class="col-md-6">
-                                        <div class="card bg-light">
-                                            <div class="card-body">
-                                                <h6>Promedios Ciclo A</h6>
-                                                <p id="estadistica-a"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="card bg-light">
-                                            <div class="card-body">
-                                                <h6>Promedios Ciclo B</h6>
-                                                <p id="estadistica-b"></p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label for="tipo_dato">Tipo de Dato:</label>
+                    <select class="form-control" id="tipo_dato" name="tipo_dato">
+                        <option value="humedad">Humedad Promedio (Cama 1 y 2)</option>
+                        <option value="humedad_cama1">Humedad Cama 1</option>
+                        <option value="humedad_cama2">Humedad Cama 2</option>
+                        <option value="consumo_agua">Consumo de Agua</option>
+                    </select>
+                </div>
+                <div class="col-md-4" id="tipo_riego_container" style="display: none;">
+                    <label for="tipo_riego">Tipo de Riego:</label>
+                    <select class="form-control" id="tipo_riego" name="tipo_riego">
+                        <option value="manual">Riego Manual</option>
+                        <option value="valvula">Válvula</option>
+                        <option value="ambos">Ambos</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mensaje de error -->
+    <div id="panel_mensajes_comparativa" style="display: none;">
+        <div class="alert alert-danger" id="mensaje_error_comparativa">
+            <!-- Mensaje de error se cargará aquí -->
+        </div>
+    </div>
+    
+    <!-- Gráficas de comparación (ocultas inicialmente) -->
+    <div id="graficas_comparativa" style="display: none;">
+        <div class="row">
+            <div class="col-md-12">
+                <h5>Resultados de Comparación</h5>
+            </div>
+        </div>
+        
+        <!-- Contenedor para gráfica principal -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h6 class="mb-0" id="titulo_grafica">Gráfica de Comparación</h6>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="graficoComparativo" height="100"></canvas>
                     </div>
                 </div>
             </div>
-            
-            <!-- Panel de Mensajes -->
-            <div id="panel-mensajes" style="display: none;">
-                <div class="alert alert-danger" id="mensaje-error"></div>
+        </div>
+        
+        <!-- Contenedor para gráficas adicionales (pastel) -->
+        <div class="row mb-4" id="graficas_adicionales" style="display: none;">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0">Ciclo A - Distribución de Riego</h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <canvas id="graficoPastelCicloA" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h6 class="mb-0">Ciclo B - Distribución de Riego</h6>
+                    </div>
+                    <div class="card-body text-center">
+                        <canvas id="graficoPastelCicloB" height="200"></canvas>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    let graficaComparativa = null;
-    
-    $(document).ready(function() {
-        // Cargar ciclos finalizados
-        cargarCiclosFinalizados();
-        
-        // Event listeners
-        $('#form-comparativa').submit(function(e) {
-            e.preventDefault();
-            compararCiclos();
-        });
-        
-        // Mostrar/ocultar selector de tipo de riego
-        $('#tipo_dato').change(function() {
-            if ($(this).val() === 'consumo_agua') {
-                $('#div_tipo_riego').show();
-            } else {
-                $('#div_tipo_riego').hide();
-            }
-        });
-    });
-    
-    // Cargar ciclos finalizados
+    // Función para cargar ciclos finalizados en los dropdowns
     function cargarCiclosFinalizados() {
         $.ajax({
-            url: '/comparativa/ciclos-finalizados',
+            url: '/bi/comparativa/ciclos-finalizados',
             method: 'GET',
-            success: function(response) {
-                if (response.success) {
-                    $('#ciclo_a').html('<option value="">Seleccione ciclo A</option>' + response.options);
-                    $('#ciclo_b').html('<option value="">Seleccione ciclo B</option>' + response.options);
+            success: function(data) {
+                if (data.options) {
+                    $('#ciclo_a').html(data.options);
+                    $('#ciclo_b').html(data.options);
                 } else {
-                    mostrarError('Error al cargar ciclos: ' + response.error);
+                    $('#ciclo_a').html('<option value="">No hay ciclos disponibles</option>');
+                    $('#ciclo_b').html('<option value="">No hay ciclos disponibles</option>');
                 }
             },
             error: function(xhr, status, error) {
-                mostrarError('Error de conexión al cargar ciclos');
-                console.log('Error:', error);
+                console.log('Error al cargar ciclos finalizados:', xhr.responseText);
+                $('#ciclo_a').html('<option value="">Error al cargar ciclos</option>');
+                $('#ciclo_b').html('<option value="">Error al cargar ciclos</option>');
             }
         });
     }
-    
-    // Comparar ciclos
-    function compararCiclos() {
-        const formData = {
-            ciclo_a: $('#ciclo_a').val(),
-            ciclo_b: $('#ciclo_b').val(),
-            tipo_dato: $('#tipo_dato').val(),
-            tipo_riego: $('#tipo_riego').val(),
-            _token: $('meta[name="csrf-token"]').attr('content')
-        };
-        
-        // Validar que sean ciclos diferentes
-        if (formData.ciclo_a === formData.ciclo_b) {
-            mostrarError('Debe seleccionar ciclos diferentes para comparar');
-            return;
-        }
-        
-        $.ajax({
-            url: '/comparativa/comparar',
-            method: 'POST',
-            data: formData,
-            beforeSend: function() {
-                $('#panel-mensajes').hide();
-                // Mostrar indicador de carga
-                $('#titulo-comparativa').html('<i class="fas fa-spinner fa-spin"></i> Generando comparativa...');
-            },
-            success: function(response) {
-                if (response.success) {
-                    mostrarResultados(response);
-                } else {
-                    mostrarError(response.error);
-                }
-            },
-            error: function(xhr, status, error) {
-                let errorMessage = 'Error al comparar ciclos';
-                if (xhr.responseJSON && xhr.responseJSON.error) {
-                    errorMessage = xhr.responseJSON.error;
-                }
-                mostrarError(errorMessage);
-                console.log('Error:', error);
-            }
-        });
-    }
-    
-    // Mostrar resultados
-    function mostrarResultados(datos) {
-        // Actualizar información de ciclos
-        $('#info-ciclo-a').html(`<strong>${datos.ciclo_a_nombre}</strong><br>${datos.ciclo_a_fechas}`);
-        $('#info-ciclo-b').html(`<strong>${datos.ciclo_b_nombre}</strong><br>${datos.ciclo_b_fechas}`);
-        
-        // Actualizar título
-        let titulo = 'Comparativa: ';
-        switch(datos.tipo_dato) {
-            case 'humedad_cama1':
-                titulo += 'Humedad Cama 1';
-                break;
-            case 'humedad_cama2':
-                titulo += 'Humedad Cama 2';
-                break;
-            case 'consumo_agua':
-                titulo += 'Consumo de Agua';
-                if (datos.tipo_riego === 'manual') titulo += ' (Riego Manual)';
-                else if (datos.tipo_riego === 'valvula') titulo += ' (Válvula)';
-                else titulo += ' (Total)';
-                break;
-        }
-        $('#titulo-comparativa').text(titulo);
-        
-        // Crear gráfica
-        crearGrafica(datos);
-        
-        // Mostrar estadísticas si es humedad
-        if (datos.tipo_dato.includes('humedad')) {
-            $('#estadistica-a').html(`Promedio: <strong>${datos.datos.ciclo_a_promedio}%</strong>`);
-            $('#estadistica-b').html(`Promedio: <strong>${datos.datos.ciclo_b_promedio}%</strong>`);
-            $('#panel-estadisticas').show();
-        } else if (datos.tipo_dato === 'consumo_agua') {
-            $('#estadistica-a').html(`Total: <strong>${datos.datos.ciclo_a_total} litros</strong>`);
-            $('#estadistica-b').html(`Total: <strong>${datos.datos.ciclo_b_total} litros</strong>`);
-            $('#panel-estadisticas').show();
+
+    // Mostrar/ocultar contenedor de tipo de riego según el tipo de dato seleccionado
+    $('#tipo_dato').change(function() {
+        var tipoDato = $(this).val();
+        if (tipoDato === 'consumo_agua') {
+            $('#tipo_riego_container').show();
         } else {
-            $('#panel-estadisticas').hide();
+            $('#tipo_riego_container').hide();
         }
+    });
+
+    // Función para crear gráfica lineal
+    function crearGraficaLineal(datosCicloA, datosCicloB, titulo, etiquetaCicloA, etiquetaCicloB) {
+        var ctx = document.getElementById('graficoComparativo').getContext('2d');
         
-        // Mostrar panel de resultados
-        $('#panel-resultados').show();
-    }
-    
-    // Crear gráfica
-    function crearGrafica(datos) {
         // Destruir gráfica anterior si existe
-        if (graficaComparativa) {
-            graficaComparativa.destroy();
+        if (window.graficoComparativo) {
+            window.graficoComparativo.destroy();
         }
         
-        const ctx = document.getElementById('grafica-comparativa').getContext('2d');
+        var labels = datosCicloA.map(item => 'Día ' + item.dia);
         
-        // Configurar colores según el tipo de dato
-        let colorA, colorB, unidad;
-        if (datos.tipo_dato.includes('humedad')) {
-            colorA = 'rgb(54, 162, 235)'; // Azul
-            colorB = 'rgb(255, 99, 132)'; // Rojo
-            unidad = '%';
-        } else {
-            colorA = 'rgb(75, 192, 192)'; // Verde
-            colorB = 'rgb(255, 159, 64)'; // Naranja
-            unidad = 'L';
-        }
-        
-        graficaComparativa = new Chart(ctx, {
+        window.graficoComparativo = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: datos.datos.etiquetas,
+                labels: labels,
+                datasets: [
+                    {
+                        label: etiquetaCicloA,
+                        data: datosCicloA.map(item => item.valor),
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        tension: 0.1
+                    },
+                    {
+                        label: etiquetaCicloB,
+                        data: datosCicloB.map(item => item.valor),
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Función para crear gráfica de barras
+    function crearGraficaBarras(datosCicloA, datosCicloB, titulo, etiquetaCicloA, etiquetaCicloB) {
+        var ctx = document.getElementById('graficoComparativo').getContext('2d');
+        
+        // Destruir gráfica anterior si existe
+        if (window.graficoComparativo) {
+            window.graficoComparativo.destroy();
+        }
+        
+        var labels = datosCicloA.map(item => 'Día ' + item.dia);
+        
+        window.graficoComparativo = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: etiquetaCicloA,
+                        data: datosCicloA.map(item => item.valor),
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: etiquetaCicloB,
+                        data: datosCicloB.map(item => item.valor),
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgb(54, 162, 235)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    }
+
+    // Función para crear gráfica de pastel
+    function crearGraficaPastel(datosCicloA, datosCicloB, titulo, etiquetaCicloA, etiquetaCicloB) {
+        var ctx = document.getElementById('graficoComparativo').getContext('2d');
+        
+        // Destruir gráfica anterior si existe
+        if (window.graficoComparativo) {
+            window.graficoComparativo.destroy();
+        }
+        
+        // Calcular totales
+        var totalA = datosCicloA.reduce((sum, item) => sum + item.valor, 0);
+        var totalB = datosCicloB.reduce((sum, item) => sum + item.valor, 0);
+        
+        window.graficoComparativo = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: [etiquetaCicloA, etiquetaCicloB],
                 datasets: [{
-                    label: datos.ciclo_a_nombre,
-                    data: datos.datos.ciclo_a_datos,
-                    borderColor: colorA,
-                    backgroundColor: colorA.replace(')', ', 0.1)').replace('rgb', 'rgba'),
-                    tension: 0.1,
-                    fill: false
-                }, {
-                    label: datos.ciclo_b_nombre,
-                    data: datos.datos.ciclo_b_datos,
-                    borderColor: colorB,
-                    backgroundColor: colorB.replace(')', ', 0.1)').replace('rgb', 'rgba'),
-                    tension: 0.1,
-                    fill: false
+                    data: [totalA, totalB],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)'
+                    ],
+                    borderWidth: 1
                 }]
             },
             options: {
@@ -297,43 +278,249 @@
                     tooltip: {
                         callbacks: {
                             label: function(context) {
-                                let label = context.dataset.label || '';
+                                var label = context.label || '';
                                 if (label) {
                                     label += ': ';
                                 }
-                                if (context.parsed.y !== null) {
-                                    label += context.parsed.y + unidad;
+                                if (context.parsed !== null) {
+                                    label += context.parsed.toFixed(2);
                                 }
                                 return label;
                             }
-                        }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: datos.tipo_dato.includes('humedad') ? 'Humedad (%)' : 'Litros'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Día del Ciclo'
                         }
                     }
                 }
             }
         });
     }
-    
-    // Mostrar mensaje de error
-    function mostrarError(mensaje) {
-        $('#mensaje-error').text(mensaje);
-        $('#panel-mensajes').show();
-        $('#panel-resultados').hide();
-        $('#titulo-comparativa').text('Resultados de Comparación');
+
+    // Función para crear gráficas de pastel para distribución de riego
+    function crearGraficasPastelDistribucion(totalesCicloA, totalesCicloB) {
+        // Gráfica para Ciclo A
+        var ctxA = document.getElementById('graficoPastelCicloA').getContext('2d');
+        
+        // Destruir gráfica anterior si existe
+        if (window.graficoPastelCicloA) {
+            window.graficoPastelCicloA.destroy();
+        }
+        
+        window.graficoPastelCicloA = new Chart(ctxA, {
+            type: 'pie',
+            data: {
+                labels: ['Riego Manual', 'Válvula'],
+                datasets: [{
+                    data: [totalesCicloA.manual, totalesCicloA.valvula],
+                    backgroundColor: [
+                        'rgba(255, 159, 64, 0.7)',
+                        'rgba(75, 192, 192, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgb(255, 159, 64)',
+                        'rgb(75, 192, 192)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed.toFixed(2) + ' L';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gráfica para Ciclo B
+        var ctxB = document.getElementById('graficoPastelCicloB').getContext('2d');
+        
+        // Destruir gráfica anterior si existe
+        if (window.graficoPastelCicloB) {
+            window.graficoPastelCicloB.destroy();
+        }
+        
+        window.graficoPastelCicloB = new Chart(ctxB, {
+            type: 'pie',
+            data: {
+                labels: ['Riego Manual', 'Válvula'],
+                datasets: [{
+                    data: [totalesCicloB.manual, totalesCicloB.valvula],
+                    backgroundColor: [
+                        'rgba(255, 159, 64, 0.7)',
+                        'rgba(75, 192, 192, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgb(255, 159, 64)',
+                        'rgb(75, 192, 192)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                var label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed.toFixed(2) + ' L';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Mostrar contenedor de gráficas adicionales
+        $('#graficas_adicionales').show();
     }
+
+    // Función para comparar ciclos
+    function compararCiclos() {
+        var cicloA = $('#ciclo_a').val();
+        var cicloB = $('#ciclo_b').val();
+        var tipoGrafica = $('#tipo_grafica').val();
+        var tipoDato = $('#tipo_dato').val();
+        var tipoRiego = $('#tipo_riego').val();
+        
+        if (!cicloA || !cicloB) {
+            $('#mensaje_error_comparativa').text('Debe seleccionar ambos ciclos');
+            $('#panel_mensajes_comparativa').show();
+            return;
+        }
+        
+        // Ocultar mensajes de error anteriores
+        $('#panel_mensajes_comparativa').hide();
+        
+        // Mostrar indicador de carga
+        $('#btn-comparar-completo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Cargando...');
+        
+        // Determinar si se necesita obtener totales para gráficas de pastel
+        var url = '/bi/comparativa/comparar';
+        var data = {
+            ciclo_a: cicloA,
+            ciclo_b: cicloB,
+            tipo_grafica: tipoGrafica,
+            tipo_dato: tipoDato,
+            tipo_riego: tipoRiego,
+            _token: '{{ csrf_token() }}'
+        };
+        
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: data,
+            success: function(response) {
+                // Ocultar gráficas adicionales
+                $('#graficas_adicionales').hide();
+                
+                // Actualizar título de la gráfica
+                var titulo = 'Comparación de ';
+                if (tipoDato === 'humedad') {
+                    titulo += 'Humedad Promedio (Cama 1 y 2)';
+                } else if (tipoDato === 'humedad_cama1') {
+                    titulo += 'Humedad Cama 1';
+                } else if (tipoDato === 'humedad_cama2') {
+                    titulo += 'Humedad Cama 2';
+                } else if (tipoDato === 'consumo_agua') {
+                    titulo += 'Consumo de Agua';
+                }
+                titulo += ' - ' + tipoGrafica.charAt(0).toUpperCase() + tipoGrafica.slice(1);
+                $('#titulo_grafica').text(titulo);
+                
+                // Mostrar gráfica
+                $('#graficas_comparativa').show();
+                
+                // Crear gráfica según el tipo seleccionado
+                var etiquetaCicloA = response.ciclo_a.nombre;
+                var etiquetaCicloB = response.ciclo_b.nombre;
+                
+                switch (tipoGrafica) {
+                    case 'lineal':
+                        crearGraficaLineal(response.ciclo_a.datos, response.ciclo_b.datos, titulo, etiquetaCicloA, etiquetaCicloB);
+                        break;
+                    case 'barra':
+                        crearGraficaBarras(response.ciclo_a.datos, response.ciclo_b.datos, titulo, etiquetaCicloA, etiquetaCicloB);
+                        break;
+                    case 'pastel':
+                        // Para pastel, mostramos totales
+                        if (tipoDato === 'consumo_agua') {
+                            // Solicitar totales específicos para distribución
+                            $.ajax({
+                                url: '/bi/comparativa/totales',
+                                method: 'POST',
+                                data: {
+                                    ciclo_a: cicloA,
+                                    ciclo_b: cicloB,
+                                    _token: '{{ csrf_token() }}'
+                                },
+                                success: function(totalesResponse) {
+                                    crearGraficaPastel(response.ciclo_a.datos, response.ciclo_b.datos, titulo, etiquetaCicloA, etiquetaCicloB);
+                                    crearGraficasPastelDistribucion(
+                                        totalesResponse.ciclo_a.totales,
+                                        totalesResponse.ciclo_b.totales
+                                    );
+                                },
+                                error: function(xhr, status, error) {
+                                    console.log('Error al obtener totales:', xhr.responseText);
+                                    crearGraficaPastel(response.ciclo_a.datos, response.ciclo_b.datos, titulo, etiquetaCicloA, etiquetaCicloB);
+                                }
+                            });
+                        } else {
+                            crearGraficaPastel(response.ciclo_a.datos, response.ciclo_b.datos, titulo, etiquetaCicloA, etiquetaCicloB);
+                        }
+                        break;
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('Error al comparar ciclos:', xhr.responseText);
+                var errorMessage = 'Error al comparar ciclos';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMessage = xhr.responseJSON.error;
+                } else if (xhr.responseText) {
+                    errorMessage = 'Error: ' + xhr.responseText;
+                }
+                $('#mensaje_error_comparativa').text(errorMessage);
+                $('#panel_mensajes_comparativa').show();
+            },
+            complete: function() {
+                // Restaurar botón
+                $('#btn-comparar-completo').prop('disabled', false).html('<i class="fas fa-sync-alt"></i> Comparar');
+            }
+        });
+    }
+
+    // Evento para el botón de comparar
+    $('#btn-comparar-completo').click(function() {
+        compararCiclos();
+    });
+
+    // Cargar ciclos al cargar la página
+    $(document).ready(function() {
+        cargarCiclosFinalizados();
+    });
 </script>
 @endsection
