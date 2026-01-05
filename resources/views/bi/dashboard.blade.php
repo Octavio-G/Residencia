@@ -637,7 +637,7 @@
                 // Actualizar días transcurridos
                 $('#dias_transcurridos').text(data.dias_transcurridos);
                 
-                // Actualizar consumo de agua total (riego manual)
+                // Actualizar consumo de agua total (inicialmente con el valor total)
                 $('#consumo_agua_total').text(parseFloat(data.consumo_agua_total).toFixed(2));
                 
                 // Cargar también el volumen de agua de la tabla valvula para este ciclo
@@ -659,6 +659,22 @@
                     error: function(xhr, status, error) {
                         console.log('Error al cargar volumen de agua por valvula:', error);
                         $('#volumen_agua_valvula').text('0.00');
+                    }
+                });
+                
+                // Cargar también el volumen de agua de la tabla riego manual para este ciclo
+                $.ajax({
+                    url: '/bi/volumen-agua-riego-manual-ciclo',
+                    method: 'POST',
+                    data: {
+                        ciclo_id: cicloId
+                    },
+                    success: function(riegoManualData) {
+                        $('#consumo_agua_total').text(parseFloat(riegoManualData.volumen_total || 0).toFixed(2));
+                    },
+                    error: function(xhr, status, error) {
+                        console.log('Error al cargar volumen de agua por riego manual:', error);
+                        $('#consumo_agua_total').text('0.00');
                     }
                 });
                 

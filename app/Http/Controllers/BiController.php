@@ -3,16 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Models\CamaSiembra;
 use App\Models\Cama2;
 use App\Models\CicloSiembra;
 use App\Models\Cultivo;
-use App\Models\Temperatura;
-use App\Models\LecturaSensor;
 use App\Models\Valvula;
+use App\Models\RiegoManual;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class BiController extends Controller
 {
@@ -160,388 +159,208 @@ class BiController extends Controller
         ]);
     }
 
-
-
-
-
-    /**
-     * Obtener lista de ciclos de siembra (para Pestaña 3 y 4)
-     */
-    public function ciclosSiembra()
-    {
-        // Obtener ciclos de siembra reales de la base de datos
-        $ciclos = CicloSiembra::all();
-
-        $options = '';
-        foreach ($ciclos as $ciclo) {
-            // Verificar que el ciclo tenga una descripción válida
-            if (!empty($ciclo->descripcion)) {
-                // Si el cicloId es null o 0, usamos una representación especial que combine ID y descripción
-                if ($ciclo->cicloId !== null && $ciclo->cicloId !== 0) {
-                    $valorOption = $ciclo->cicloId;
-                } else {
-                    // Usar una representación que combine ID y descripción para evitar colisiones
-                    $valorOption = 'DESC_' . urlencode($ciclo->descripcion);
-                }
-                $options .= '<option value="'.htmlspecialchars($valorOption, ENT_QUOTES, 'UTF-8').'">'.htmlspecialchars($ciclo->descripcion, ENT_QUOTES, 'UTF-8').'</option>';
-            }
-        }
-
-        // Si no hay ciclos, usar datos simulados
-        if (empty($options)) {
-            $ciclosSimulados = [
-                ['cicloId' => 1, 'descripcion' => 'Ciclo Primavera 2025'],
-                ['cicloId' => 2, 'descripcion' => 'Ciclo Verano 2025'],
-                ['cicloId' => 3, 'descripcion' => 'Ciclo Otoño 2025'],
-                ['cicloId' => 4, 'descripcion' => 'Ciclo Invierno 2025'],
-                ['cicloId' => 5, 'descripcion' => 'Ciclo Experimental A'],
-            ];
-
-            foreach ($ciclosSimulados as $ciclo) {
-                $options .= '<option value="'.$ciclo['cicloId'].'">'.$ciclo['descripcion'].'</option>';
-            }
-        }
-
-        return response()->json([
-            'options' => $options
-        ]);
-    }
-
-    /**
-     * Obtener datos del ciclo seleccionado (para Pestaña 4)
-     */
-    public function datosCiclo(Request $request)
-    {
-        try {
-            $cicloId = $request->input('ciclo_id');
-            
-            // Registrar el ID del ciclo para depuración
-            Log::info('Solicitando datos para ciclo ID: ' . $cicloId . ' (tipo: ' . gettype($cicloId) . ')');
-            
-            // Obtener el ciclo seleccionado
-            // Si el ID comienza con 'DESC_', buscar por descripción; si no, buscar por ID numérico
-            if (strpos($cicloId, 'DESC_') === 0) {
-                // Extraer la descripción del valor
-                $descripcion = urldecode(substr($cicloId, 5));
-                Log::info('Buscando ciclo por descripción: ' . $descripcion);
-                $ciclo = CicloSiembra::where('descripcion', $descripcion)->first();
-            } else {
-                Log::info('Buscando ciclo por ID numérico: ' . $cicloId);
-                $ciclo = CicloSiembra::find($cicloId);
-            }
-            
-            if (!$ciclo) {
-                // Buscar en todos los ciclos para ver qué hay disponible
-                $todosLosCiclos = CicloSiembra::all();
-                Log::warning('Ciclo no encontrado. Ciclos disponibles: ' . $todosLosCiclos->pluck('descripcion')->toJson());
-                return response()->json(['error' => 'Ciclo no encontrado: ' . $cicloId], 404);
-            }
-            
-            // Registrar información del ciclo para depuración
-            Log::info('Ciclo encontrado: ' . json_encode($ciclo));
-            
-            // Calcular días transcurridos
-            $fechaInicio = Carbon::parse($ciclo->fechaInicio);
-            $hoy = Carbon::today();
-            
-            if ($ciclo->fechaFin && $ciclo->fechaFin != '0000-00-00') {
-                $fechaFin = Carbon::parse($ciclo->fechaFin);
-                
-                // Verificar si el ciclo ya terminó
-                if ($hoy->gte($fechaFin)) {
-                    // Ciclo completado
-                    $diasTranscurridos = $fechaInicio->diffInDays($fechaFin);
-                    $diasRestantes = 0;
-                    $cicloCompletado = true;
-                } else {
-                    // Ciclo en progreso
-                    $diasTranscurridos = $fechaInicio->diffInDays($hoy);
-                    $diasRestantes = $hoy->diffInDays($fechaFin);
-                    $cicloCompletado = false;
-                }
-            } else {
-                // Si no hay fecha de fin definida, asumimos que es un ciclo en progreso indefinido
-                $diasTranscurridos = $fechaInicio->diffInDays($hoy);
-                $diasRestantes = null; // No se puede calcular
-                $cicloCompletado = false;
-            }
-            
-            // Calcular consumo de agua total
-            $consumoAguaTotal = $this->calcularConsumoAguaTotal($cicloId);
-            
-            // Registrar consumo de agua para depuración
-            Log::info('Consumo de agua total: ' . $consumoAguaTotal);
-            
-            // Verificar si el ciclo está completado
-            $cicloCompletado = $ciclo->estado === 'completado' || 
-                              ($ciclo->fechaFin && $ciclo->fechaFin != '0000-00-00' && 
-                               $hoy->gte(Carbon::parse($ciclo->fechaFin)));
-            
-            $respuesta = [
-                'ciclo' => $ciclo,
-                'dias_transcurridos' => $diasTranscurridos,
-                'dias_restantes' => $diasRestantes,
-                'consumo_agua_total' => $consumoAguaTotal,
-                'ciclo_completado' => $cicloCompletado
-            ];
-            
-            // Registrar respuesta para depuración
-            Log::info('Respuesta de datos de ciclo: ' . json_encode($respuesta));
-            
-            return response()->json($respuesta);
-        } catch (\Exception $e) {
-            Log::error('Error al cargar los datos del ciclo: ' . $e->getMessage());
-            return response()->json(['error' => 'Error al cargar los datos del ciclo: ' . $e->getMessage()], 500);
-        }
-    }
-    
-    /**
-     * Calcular el consumo total de agua para el ciclo
-     */
-    private function calcularConsumoAguaTotal($cicloId)
-    {
-        try {
-            // Registrar el ID del ciclo para depuración
-            Log::info('Calculando consumo de agua para ciclo ID: ' . $cicloId);
-            
-            // Obtener todos los cultivos asociados a este ciclo
-            // Si el ID es numérico, buscar por ID; si no, buscar por descripción del ciclo
-            if (is_numeric($cicloId)) {
-                $cultivos = Cultivo::where('cicloId', $cicloId)->get();
-            } else {
-                $ciclo = CicloSiembra::where('descripcion', $cicloId)->first();
-                if ($ciclo) {
-                    $cultivos = Cultivo::where('cicloId', $ciclo->cicloId)->get();
-                } else {
-                    $cultivos = collect();
-                }
-            }
-            
-            // Registrar información de cultivos para depuración
-            Log::info('Cultivos encontrados: ' . $cultivos->count());
-            
-            if ($cultivos->isEmpty()) {
-                Log::info('No se encontraron cultivos para el ciclo ID: ' . $cicloId);
-                return 0;
-            }
-            
-            // Obtener los IDs de los cultivos
-            $cultivoIds = $cultivos->pluck('cultivoId')->toArray();
-            
-            // Registrar IDs de cultivos para depuración
-            Log::info('IDs de cultivos: ' . json_encode($cultivoIds));
-            
-            // Obtener la suma total de volumen de riego para estos cultivos
-            $totalLitros = LecturaSensor::whereIn('cultivoId', $cultivoIds)
-                ->whereNotNull('volumen')
-                ->sum('volumen');
-            
-            // Registrar total de litros para depuración
-            Log::info('Total de litros calculado: ' . $totalLitros);
-            
-            return $totalLitros ?: 0;
-        } catch (\Exception $e) {
-            Log::error('Error al calcular consumo de agua: ' . $e->getMessage());
-            return 0;
-        }
-    }
-
-    /**
-     * Comparar dos ciclos de siembra (Pestaña 3)
-     */
-    public function compararCiclos(Request $request)
-    {
-        $ciclo1 = $request->input('ciclo1');
-        $ciclo2 = $request->input('ciclo2');
-        $metrica = $request->input('metrica');
-
-        // Obtener descripciones de los ciclos
-        // Si el ID es numérico, buscar por ID; si no, buscar por descripción
-        if (is_numeric($ciclo1)) {
-            $ciclo1Data = CicloSiembra::find($ciclo1);
-        } else {
-            $ciclo1Data = CicloSiembra::where('descripcion', $ciclo1)->first();
-        }
-        
-        if (is_numeric($ciclo2)) {
-            $ciclo2Data = CicloSiembra::find($ciclo2);
-        } else {
-            $ciclo2Data = CicloSiembra::where('descripcion', $ciclo2)->first();
-        }
-
-        $nombreCiclo1 = $ciclo1Data ? $ciclo1Data->descripcion : 'Ciclo 1';
-        $nombreCiclo2 = $ciclo2Data ? $ciclo2Data->descripcion : 'Ciclo 2';
-
-        // Etiquetas para el eje X (días de cultivo)
-        $etiquetas = [];
-        for ($i = 1; $i <= 30; $i++) {
-            $etiquetas[] = 'Día '.$i;
-        }
-
-        // Generar datos simulados para ambos ciclos
-        $datosCiclo1 = [];
-        $datosCiclo2 = [];
-
-        // Parámetros para generar datos realistas según la métrica
-        switch ($metrica) {
-            case 'humedad':
-                // Humedad del suelo en %
-                $base1 = rand(50, 70);
-                $base2 = rand(50, 70);
-                for ($i = 0; $i < 30; $i++) {
-                    $datosCiclo1[] = max(30, min(90, $base1 + rand(-10, 10)));
-                    $datosCiclo2[] = max(30, min(90, $base2 + rand(-10, 10)));
-                }
-                break;
-            case 'temperatura':
-                // Temperatura en °C
-                $base1 = rand(20, 28);
-                $base2 = rand(20, 28);
-                for ($i = 0; $i < 30; $i++) {
-                    $datosCiclo1[] = max(10, min(40, $base1 + rand(-5, 5)));
-                    $datosCiclo2[] = max(10, min(40, $base2 + rand(-5, 5)));
-                }
-                break;
-            default:
-                // Por defecto, humedad
-                $base1 = rand(50, 70);
-                $base2 = rand(50, 70);
-                for ($i = 0; $i < 30; $i++) {
-                    $datosCiclo1[] = max(30, min(90, $base1 + rand(-10, 10)));
-                    $datosCiclo2[] = max(30, min(90, $base2 + rand(-10, 10)));
-                }
-        }
-
-        return response()->json([
-            'etiquetas' => $etiquetas,
-            'nombre_ciclo1' => $nombreCiclo1,
-            'nombre_ciclo2' => $nombreCiclo2,
-            'datos_ciclo1' => $datosCiclo1,
-            'datos_ciclo2' => $datosCiclo2
-        ]);
-    }
-
-    /**
-     * Exportar gráfico comparativo a PDF
-     */
-    public function exportarPdf(Request $request)
-    {
-        $ciclo1 = $request->input('ciclo1');
-        $ciclo2 = $request->input('ciclo2');
-        $metrica = $request->input('metrica');
-
-        // Obtener descripciones de los ciclos
-        // Si el ID comienza con 'DESC_', buscar por descripción; si no, buscar por ID numérico
-        if (strpos($ciclo1, 'DESC_') === 0) {
-            // Extraer la descripción del valor
-            $descripcion1 = urldecode(substr($ciclo1, 5));
-            $ciclo1Data = CicloSiembra::where('descripcion', $descripcion1)->first();
-        } else {
-            $ciclo1Data = CicloSiembra::find($ciclo1);
-        }
-        
-        if (strpos($ciclo2, 'DESC_') === 0) {
-            // Extraer la descripción del valor
-            $descripcion2 = urldecode(substr($ciclo2, 5));
-            $ciclo2Data = CicloSiembra::where('descripcion', $descripcion2)->first();
-        } else {
-            $ciclo2Data = CicloSiembra::find($ciclo2);
-        }
-
-        $nombreCiclo1 = $ciclo1Data ? $ciclo1Data->descripcion : 'Ciclo 1';
-        $nombreCiclo2 = $ciclo2Data ? $ciclo2Data->descripcion : 'Ciclo 2';
-
-        // Datos para la vista del PDF
-        $data = [
-            'ciclo1' => $nombreCiclo1,
-            'ciclo2' => $nombreCiclo2,
-            'metrica' => $metrica,
-        ];
-
-        // En una implementación completa, aquí generaríamos el PDF real
-        // Por ahora, simplemente devolvemos una respuesta JSON
-        return response()->json([
-            'message' => 'Informe PDF generado correctamente',
-            'data' => $data
-        ]);
-
-        // Para una implementación completa con DomPDF, se usaría algo como:
-        /*
-        $pdf = \PDF::loadView('bi.reporte_pdf', $data);
-        return $pdf->download('informe_comparativo_'.$ciclo1.'_vs_'.$ciclo2.'.pdf');
-        */
-    }
-    
     /**
      * Obtener volumen de agua usado durante un ciclo de siembra
      */
     public function volumenAguaCiclo(Request $request)
     {
-        try {
-            $cicloId = $request->input('ciclo_id');
-            
-            // Registrar para depuración
-            Log::info('Solicitando volumen de agua para ciclo ID: ' . $cicloId . ' (tipo: ' . gettype($cicloId) . ')');
-            
-            // Obtener el ciclo seleccionado
-            // Si el ID comienza con 'DESC_', buscar por descripción; si no, buscar por ID numérico
-            if (strpos($cicloId, 'DESC_') === 0) {
-                // Extraer la descripción del valor
-                $descripcion = urldecode(substr($cicloId, 5));
-                Log::info('Buscando ciclo por descripción: ' . $descripcion);
-                $ciclo = CicloSiembra::where('descripcion', $descripcion)->first();
-            } else {
-                Log::info('Buscando ciclo por ID numérico: ' . $cicloId);
-                $ciclo = CicloSiembra::find($cicloId);
-            }
-            
-            if (!$ciclo) {
-                // Buscar en todos los ciclos para ver qué hay disponible
-                $todosLosCiclos = CicloSiembra::all();
-                Log::warning('Ciclo no encontrado. Ciclos disponibles: ' . $todosLosCiclos->pluck('descripcion')->toJson());
-                return response()->json(['error' => 'Ciclo no encontrado: ' . $cicloId], 404);
-            }
-            
-            // Verificar si el ciclo tiene fechas válidas
-            if (!$ciclo->fechaInicio) {
-                return response()->json(['error' => 'El ciclo no tiene fecha de inicio'], 400);
-            }
-            
-            $fechaInicio = $ciclo->fechaInicio;
-            $fechaFin = $ciclo->fechaFin && $ciclo->fechaFin != '0000-00-00' ? $ciclo->fechaFin : null;
-            
-            // Obtener los cultivos asociados a este ciclo
-            $cultivoIds = Cultivo::where('cicloId', $ciclo->cicloId)->pluck('cultivoId')->toArray();
-            
-            // Calcular volumen total de agua usado en la tabla valvula durante el periodo del ciclo
-            $query = \App\Models\Valvula::whereIn('cultivoId', $cultivoIds);
-            
-            // Filtrar por fechas del ciclo
-            $query->where('fechaEncendido', '>=', $fechaInicio);
-            
-            if ($fechaFin) {
-                $query->where('fechaEncendido', '<=', $fechaFin);
-            }
-            
-            $volumenTotal = $query->sum('volumen');
-            
-            // Obtener también el volumen por fecha para mostrar en gráfico
-            $volumenPorFecha = $query->selectRaw('DATE(fechaEncendido) as fecha, SUM(volumen) as volumen')
-                ->groupBy('fecha')
-                ->orderBy('fecha')
-                ->get();
-            
-            return response()->json([
-                'volumen_total' => $volumenTotal,
-                'volumen_por_fecha' => $volumenPorFecha,
-                'fecha_inicio' => $fechaInicio,
-                'fecha_fin' => $fechaFin,
-                'ciclo_descripcion' => $ciclo->descripcion
-            ]);
-            
-        } catch (\Exception $e) {
-            Log::error('Error al calcular volumen de agua por ciclo: ' . $e->getMessage());
-            return response()->json(['error' => 'Error al calcular volumen de agua: ' . $e->getMessage()], 500);
+        $cicloId = $request->input('ciclo_id');
+        
+        // Obtener el ciclo seleccionado
+        $ciclo = CicloSiembra::where('cicloId', $cicloId)->first();
+        if (!$ciclo) {
+            return response()->json(['error' => 'Ciclo no encontrado'], 404);
         }
+        
+        // Obtener IDs de cultivos asociados al ciclo
+        $cultivoIds = Cultivo::where('cicloId', $cicloId)->pluck('cultivoId');
+        
+        // Calcular volumen total de agua usado en la tabla valvula durante el periodo del ciclo
+        $volumenTotal = Valvula::whereIn('cultivoId', $cultivoIds)
+            ->sum('volumen');
+        
+        // Obtener también el volumen por fecha para mostrar en gráfico
+        $volumenPorFecha = Valvula::whereIn('cultivoId', $cultivoIds)
+            ->selectRaw('DATE(fechaEncendido) as fecha, SUM(volumen) as volumen')
+            ->groupBy('fecha')
+            ->orderBy('fecha')
+            ->get();
+        
+        return response()->json([
+            'volumen_total' => $volumenTotal,
+            'volumen_por_fecha' => $volumenPorFecha,
+            'fecha_inicio' => $ciclo->fechaInicio,
+            'fecha_fin' => $ciclo->fechaFin,
+            'ciclo_descripcion' => $ciclo->descripcion
+        ]);
+    }
+
+    /**
+     * Obtener volumen de agua usado en riego manual durante un ciclo de siembra
+     */
+    public function volumenAguaRiegoManualCiclo(Request $request)
+    {
+        $cicloId = $request->input('ciclo_id');
+        
+        // Obtener el ciclo seleccionado
+        $ciclo = CicloSiembra::where('cicloId', $cicloId)->first();
+        if (!$ciclo) {
+            return response()->json(['error' => 'Ciclo no encontrado'], 404);
+        }
+        
+        // Obtener IDs de cultivos asociados al ciclo
+        $cultivoIds = Cultivo::where('cicloId', $cicloId)->pluck('cultivoId');
+        
+        // Calcular volumen total de agua usado en la tabla riegomanual durante el periodo del ciclo
+        $volumenTotal = RiegoManual::whereIn('cultivoId', $cultivoIds)
+            ->sum('volumen');
+        
+        // Obtener también el volumen por fecha para mostrar en gráfico
+        $volumenPorFecha = RiegoManual::whereIn('cultivoId', $cultivoIds)
+            ->selectRaw('DATE(fechaEncendido) as fecha, SUM(volumen) as volumen')
+            ->groupBy('fecha')
+            ->orderBy('fecha')
+            ->get();
+        
+        return response()->json([
+            'volumen_total' => $volumenTotal,
+            'volumen_por_fecha' => $volumenPorFecha,
+            'fecha_inicio' => $ciclo->fechaInicio,
+            'fecha_fin' => $ciclo->fechaFin,
+            'ciclo_descripcion' => $ciclo->descripcion
+        ]);
+    }
+    
+    /**
+     * Obtener lista de ciclos de siembra (para Pestaña 3 y 4)
+     */
+    public function ciclosSiembra(Request $request)
+    {
+        $ciclos = CicloSiembra::orderBy('fechaInicio', 'desc')
+            ->get(['cicloId', 'descripcion', 'fechaInicio', 'fechaFin']);
+        
+        Log::info('Ciclos encontrados en la base de datos: ' . $ciclos->count());
+        
+        // Crear mapeo de índices a IDs (UUIDs o numéricas)
+        $indiceAMapeo = [];
+        $options = '';
+        
+        foreach ($ciclos as $index => $ciclo) {
+            $indiceId = 'IDX_' . $index;
+            $indiceAMapeo[$indiceId] = $ciclo->cicloId;
+            
+            // Generar opción con índice en lugar del ID completo (aceptar UUIDs o IDs numéricas)
+            $options .= '<option value="' . $indiceId . '">' . $ciclo->descripcion . ' (' . $ciclo->fechaInicio . ' - ' . ($ciclo->fechaFin ?? 'En curso') . ')</option>';
+            
+            Log::info('Opción generada: ' . $indiceId . ' -> ' . $ciclo->cicloId . ' (' . $ciclo->descripcion . ')');
+        }
+        
+        // Almacenar el mapeo en la sesión
+        session(['indice_ciclo_mapping' => $indiceAMapeo]);
+        
+        Log::info('Mapeo almacenado en sesión. Total opciones: ' . count($indiceAMapeo));
+        Log::info('Total de opciones generadas: ' . substr_count($options, '<option'));
+
+        return response()->json([
+            'success' => true,
+            'options' => $options
+        ]);
+    }
+    
+    /**
+     * Obtener datos del ciclo seleccionado (para Pestaña 4)
+     */
+    public function datosCiclo(Request $request)
+    {
+        $indiceId = $request->input('ciclo_id');
+            
+        // Depuración: ver qué índice se está recibiendo
+        Log::info('Solicitando ciclo con índice: ' . $indiceId . ' (tipo: ' . gettype($indiceId) . ')');
+            
+        // Obtener el mapeo de la sesión
+        $indiceAMapeo = session('indice_ciclo_mapping', []);
+            
+        // Verificar que el índice exista en el mapeo
+        if (!isset($indiceAMapeo[$indiceId])) {
+            Log::warning('Índice no encontrado en el mapeo: ' . $indiceId);
+            Log::warning('Mapeo disponible: ' . json_encode(array_keys($indiceAMapeo)));
+            return response()->json(['error' => 'Índice de ciclo no válido: ' . $indiceId], 400);
+        }
+            
+        // Obtener el UUID real del mapeo
+        $cicloIdReal = $indiceAMapeo[$indiceId];
+        Log::info('Mapeando índice ' . $indiceId . ' a UUID real: ' . $cicloIdReal);
+            
+        // Buscar el ciclo usando el UUID real
+        $ciclo = CicloSiembra::where('cicloId', $cicloIdReal)->first();
+            
+        if (!$ciclo) {
+            // Verificar qué ciclos existen en la base de datos
+            $todosLosCiclos = CicloSiembra::all(['cicloId', 'descripcion'])->toArray();
+            Log::warning('Ciclo no encontrado. Ciclos disponibles: ' . json_encode($todosLosCiclos));
+            return response()->json(['error' => 'Ciclo no encontrado para índice: ' . $indiceId], 404);
+        }
+        
+        // Calcular días transcurridos
+        try {
+            $fechaInicio = Carbon::parse($ciclo->fechaInicio);
+        } catch (Exception $e) {
+            // Si hay un problema con el formato de fecha, usar una fecha por defecto
+            $fechaInicio = Carbon::now();
+            Log::warning('Formato de fecha inválido para fechaInicio: ' . $ciclo->fechaInicio);
+        }
+        
+        $fechaFin = null;
+        if ($ciclo->fechaFin) {
+            try {
+                $fechaFin = Carbon::parse($ciclo->fechaFin);
+            } catch (Exception $e) {
+                Log::warning('Formato de fecha inválido para fechaFin: ' . $ciclo->fechaFin);
+            }
+        }
+        
+        $fechaActual = Carbon::now();
+        
+        // Calcular la diferencia en días
+        // Si el ciclo ya ha terminado, los días transcurridos son entre inicio y fin
+        // Si el ciclo está en curso, los días transcurridos son entre inicio y fecha actual
+        if ($ciclo->fechaFin && $fechaFin && $fechaActual->gte($fechaFin)) {
+            // Ciclo completado: calcular días entre inicio y fin
+            $diasTranscurridos = max(0, $fechaInicio->diffInDays($fechaFin));
+        } else {
+            // Ciclo en curso: calcular días entre inicio y fecha actual
+            $diasTranscurridos = max(0, $fechaInicio->diffInDays($fechaActual));
+        }
+        
+        // Determinar si el ciclo está completado (basado en fechaFin)
+        $cicloCompletado = $fechaFin && $fechaActual->gte($fechaFin);
+        
+        // Calcular días restantes si no está completado
+        $diasRestantes = null;
+        if (!$cicloCompletado && $fechaFin) {
+            $diasRestantes = max(0, $fechaActual->diffInDays($fechaFin));
+        }
+        
+        // Obtener IDs de cultivos asociados al ciclo
+        $cultivoIds = Cultivo::where('cicloId', $cicloIdReal)->pluck('cultivoId');
+        
+        // Calcular consumo de agua total
+        $volumenValvula = Valvula::whereIn('cultivoId', $cultivoIds)->sum('volumen');
+        $volumenRiegoManual = RiegoManual::whereIn('cultivoId', $cultivoIds)->sum('volumen');
+        $consumoAguaTotal = $volumenValvula + $volumenRiegoManual;
+        
+        return response()->json([
+            'ciclo' => [
+                'id' => $ciclo->cicloId,
+                'descripcion' => $ciclo->descripcion,
+                'fechaInicio' => $ciclo->fechaInicio,
+                'fechaFin' => $ciclo->fechaFin,
+                'estado' => $cicloCompletado ? 'completado' : 'activo',
+            ],
+            'dias_transcurridos' => $diasTranscurridos,
+            'dias_restantes' => $diasRestantes,
+            'consumo_agua_total' => $consumoAguaTotal,
+            'ciclo_completado' => $cicloCompletado
+        ]);
     }
 }
