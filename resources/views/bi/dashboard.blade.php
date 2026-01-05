@@ -4,8 +4,6 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-md-12">
-            <h1 class="mt-4">Dashboard HortaView</h1>
-            <p class="mb-4">Sistema de monitoreo agrícola avanzado</p>
             
             <!-- Pestañas principales -->
             <ul class="nav nav-tabs" id="biTabs" role="tablist">
@@ -39,7 +37,7 @@
             <div class="tab-content" id="biTabsContent">
                 <!-- Pestaña 1: Indicador de Salud -->
                 <div class="tab-pane fade show active" id="indicador-salud" role="tabpanel">
-                    <div class="card mt-4">
+                    <div class="card mt-1">
                         <div class="card-header">
                             <h5>Indicador de Salud de Camas de Siembra</h5>
                         </div>
@@ -125,7 +123,7 @@
                 
                 <!-- Pestaña 4: Ciclos de Siembra -->
                 <div class="tab-pane fade" id="ciclos-siembra" role="tabpanel">
-                    <div class="card mt-4">
+                    <div class="card mt-1">
                         <div class="card-header">
                             <h5>Gestión de Ciclos de Siembra</h5>
                         </div>
@@ -235,116 +233,10 @@
         </div>
     </div>
 
-    <!-- Pestaña 2: Ciclos de Siembra -->
-    <div class="tab-pane fade" id="ciclos-siembra" role="tabpanel">
-        <div class="card mt-4">
-            <div class="card-header">
-                <h5>Gestión de Ciclos de Siembra</h5>
-            </div>
-            <div class="card-body">
-                <!-- Selector de Ciclos -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>Seleccionar Ciclo de Siembra</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label for="ciclo_selector">Ciclo de Siembra:</label>
-                            <select class="form-control" id="ciclo_selector">
-                                <option value="">Seleccione un ciclo</option>
-                                <!-- Opciones se cargarán dinámicamente -->
-                            </select>
-                        </div>
-                        
-                        <button class="btn btn-primary" id="btn_cargar_datos">
-                            <i class="fas fa-sync-alt"></i> Cargar Datos
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Panel de Mensajes -->
-                <div id="panel_mensajes" style="display: none;">
-                    <div class="alert alert-danger" id="mensaje_error">
-                        <!-- Mensaje de error se cargará aquí -->
-                    </div>
-                </div>
-                
-                <!-- Panel de Información del Ciclo -->
-                <div id="panel_informacion" style="display: none;">
-                    <div class="row">
-                        <!-- Tarjeta de Información del Ciclo -->
-                        <div class="col-md-6 mb-4">
-                            <div class="card border-primary">
-                                <div class="card-header bg-primary text-white">
-                                    <h5 class="mb-0">Información del Ciclo</h5>
-                                </div>
-                                <div class="card-body">
-                                    <h4 id="nombre_ciclo"></h4>
-                                    <p><strong>Fecha de Inicio:</strong> <span id="fecha_inicio"></span></p>
-                                    <p><strong>Fecha de Fin:</strong> <span id="fecha_fin"></span></p>
-                                    <p><strong>Estado:</strong> <span id="estado"></span></p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Tarjeta de Días Transcurridos -->
-                        <div class="col-md-6 mb-4">
-                            <div class="card border-info">
-                                <div class="card-header bg-info text-white">
-                                    <h5 class="mb-0">Días Transcurridos</h5>
-                                </div>
-                                <div class="card-body text-center">
-                                    <h2 id="dias_transcurridos" class="display-4">0</h2>
-                                    <p class="text-muted">días</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Tarjeta de Días Restantes o Estado del Ciclo -->
-                        <div class="col-md-6 mb-4">
-                            <div class="card border-success" id="card_dias_restantes">
-                                <div class="card-header bg-success text-white">
-                                    <h5 class="mb-0">Días Restantes</h5>
-                                </div>
-                                <div class="card-body text-center">
-                                    <h2 id="dias_restantes" class="display-4">0</h2>
-                                    <p class="text-muted">días</p>
-                                </div>
-                            </div>
-                            <div class="card border-success d-none" id="card_ciclo_completado">
-                                <div class="card-header bg-success text-white">
-                                    <h5 class="mb-0">Estado del Ciclo</h5>
-                                </div>
-                                <div class="card-body text-center">
-                                    <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                                    <h4 class="text-success">Ciclo Completado</h4>
-                                    <p class="text-muted">Listo para cosecha</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Tarjeta de Estado -->
-                        <div class="col-md-6 mb-4">
-                            <div class="card border-warning">
-                                <div class="card-header bg-warning text-white">
-                                    <h5 class="mb-0">Estado del Ciclo</h5>
-                                </div>
-                                <div class="card-body text-center">
-                                    <div id="estado_ciclo">
-                                        <!-- El estado se cargará aquí dinámicamente -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Pestaña 3: Comparativa Histórica -->
     <div class="tab-pane fade" id="comparativa-historica" role="tabpanel">
-        <div class="card mt-4">
+        <div class="card mt-0 border-top-0 rounded-0">
             <div class="card-header">
                 <h5>Comparativa Histórica de Ciclos de Siembra</h5>
             </div>
@@ -467,7 +359,7 @@
 
     <!-- Pestaña 4: Índice de Secado -->
     <div class="tab-pane fade" id="indice-secado" role="tabpanel">
-        <div class="card mt-4">
+        <div class="card mt-0 border-top-0 rounded-0">
             <div class="card-header">
                 <h5>Índice de Secado</h5>
             </div>
