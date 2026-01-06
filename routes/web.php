@@ -8,6 +8,7 @@ use App\Http\Controllers\ComparativaController;
 use App\Http\Controllers\IndiceSecadoController;
 use App\Http\Controllers\PrediccionAguaController;
 
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -150,5 +151,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/prediccion-agua-view', [PrediccionAguaController::class, 'index']);
         // Ruta para la API de predicción (AJAX)
         Route::get('/prediccion-agua', [PrediccionAguaController::class, 'predecir']);
+        
+
     });
 });

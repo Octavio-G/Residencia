@@ -41,8 +41,11 @@
                 
                 <div class="tab-pane fade show active" id="indicador-salud" role="tabpanel">
                     <div class="card mt-0 border-top-0 rounded-0">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5>Indicador de Salud de Camas de Siembra</h5>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="capturarYDescargar('indicador-salud', 'Reporte_Salud')">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -78,10 +81,10 @@
                                                     <div class="col-md-3">
                                                         <label>&nbsp;</label>
                                                         <div>
-                                                            <button type="submit" class="btn btn-primary">
+                                                            <button type="submit" class="btn btn-secondary">
                                                                 <i class="fas fa-filter"></i> Filtrar
                                                             </button>
-                                                            <button type="button" class="btn btn-secondary" id="btn-limpiar-filtros">
+                                                            <button type="button" class="btn btn-outline-secondary" id="btn-limpiar-filtros">
                                                                 <i class="fas fa-eraser"></i> Limpiar
                                                             </button>
                                                         </div>
@@ -118,13 +121,16 @@
 
                 <div class="tab-pane fade" id="indice-secado" role="tabpanel">
                     <div class="card mt-0 border-top-0 rounded-0">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5>Índice de Secado</h5>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="capturarYDescargar('indice-secado', 'Reporte_Indice_Secado')">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
                         </div>
                         <div class="card-body">
                             <div class="row mb-4">
                                 <div class="col-12">
-                                    <button class="btn btn-primary" id="btn-cargar-secado">
+                                    <button class="btn btn-outline-secondary" id="btn-cargar-secado">
                                         <i class="fas fa-sync-alt"></i> Actualizar Datos
                                     </button>
                                 </div>
@@ -201,8 +207,11 @@
 
                 <div class="tab-pane fade" id="ciclos-siembra" role="tabpanel">
                     <div class="card mt-0 border-top-0 rounded-0">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5>Gestión de Ciclos de Siembra</h5>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="capturarYDescargar('ciclos-siembra', 'Reporte_Ciclos_Siembra')">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
                         </div>
                         <div class="card-body">
                             <div class="card mb-4">
@@ -217,7 +226,7 @@
                                             </select>
                                     </div>
                                     
-                                    <button class="btn btn-primary" id="btn_cargar_datos">
+                                    <button class="btn btn-secondary" id="btn_cargar_datos">
                                         <i class="fas fa-sync-alt"></i> Cargar Datos
                                     </button>
                                 </div>
@@ -289,6 +298,51 @@
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Tarjeta de Consumo de Válvula -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card border-info">
+                                            <div class="card-header bg-info text-white">
+                                                <h5 class="mb-0">
+                                                    <i class="fas fa-faucet"></i> Consumo Válvula
+                                                </h5>
+                                            </div>
+                                            <div class="card-body text-center">
+                                                <h3 id="val_consumo_valvula" class="display-4">0</h3>
+                                                <p class="text-muted">Litros</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Tarjeta de Consumo Manual -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card border-warning">
+                                            <div class="card-header bg-warning text-white">
+                                                <h5 class="mb-0">
+                                                    <i class="fas fa-hand-holding-water"></i> Consumo Manual
+                                                </h5>
+                                            </div>
+                                            <div class="card-body text-center">
+                                                <h3 id="val_consumo_manual" class="display-4">0</h3>
+                                                <p class="text-muted">Litros</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Tarjeta de Consumo Total -->
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card border-success">
+                                            <div class="card-header bg-success text-white">
+                                                <h5 class="mb-0">
+                                                    <i class="fas fa-water"></i> Consumo Total
+                                                </h5>
+                                            </div>
+                                            <div class="card-body text-center">
+                                                <h3 id="consumo_agua_total" class="display-4">0</h3>
+                                                <p class="text-muted">Litros</p>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -297,8 +351,11 @@
 
                 <div class="tab-pane fade" id="comparativa-historica" role="tabpanel">
                     <div class="card mt-0 border-top-0 rounded-0">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5>Comparativa Histórica de Ciclos de Siembra</h5>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="capturarYDescargar('comparativa-historica', 'Reporte_Comparativa_Historica')">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
                         </div>
                         <div class="card-body">
                             <div class="card mb-4">
@@ -307,29 +364,28 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label for="ciclo_a">Ciclo A:</label>
                                             <select class="form-control" id="ciclo_a" name="ciclo_a">
                                                 <option value="">Seleccione un ciclo</option>
                                                 </select>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label for="ciclo_b">Ciclo B:</label>
                                             <select class="form-control" id="ciclo_b" name="ciclo_b">
                                                 <option value="">Seleccione un ciclo</option>
                                                 </select>
                                         </div>
-                                        <div class="col-md-2">
-                                            <label for="tipo_grafica">Tipo de Gráfica:</label>
-                                            <select class="form-control" id="tipo_grafica" name="tipo_grafica">
-                                                <option value="lineal">Lineal</option>
-                                                <option value="barra">Barra</option>
-                                                <option value="radar">Radar</option>
-                                            </select>
+                                        <div class="col-md-3">
+                                            <label>Tipo de Gráfica:</label>
+                                            <div class="btn-group d-flex" role="group">
+                                                <button type="button" class="btn btn-outline-secondary btn-grafica-tipo" onclick="seleccionarTipoGrafica('lineal')">Lineal</button>
+                                                <button type="button" class="btn btn-outline-secondary btn-grafica-tipo" onclick="seleccionarTipoGrafica('barras')">Barras</button>
+                                                <button type="button" class="btn btn-outline-secondary btn-grafica-tipo" onclick="seleccionarTipoGrafica('radar')">Radar</button>
+                                            </div>
                                         </div>
-                                        <div class="col-md-2">
-                                            <label>&nbsp;</label>
-                                            <button type="button" class="btn btn-primary form-control" id="btn-comparar-completo">
+                                        <div class="col-md-3 d-flex align-items-end">
+                                            <button type="button" class="btn btn-secondary btn-block" id="btn-comparar-completo">
                                                 <i class="fas fa-sync-alt"></i> Comparar
                                             </button>
                                         </div>
@@ -370,8 +426,11 @@
                                 <div class="row mb-4">
                                     <div class="col-md-12">
                                         <div class="card">
-                                            <div class="card-header bg-primary text-white">
+                                            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                                                 <h6 class="mb-0" id="titulo_grafica">Gráfica de Comparación</h6>
+                                                <button type="button" class="btn btn-sm btn-outline-light" onclick="refrescarGraficaComparativa()" title="Refrescar Gráfica">
+                                                    <i class="fas fa-sync-alt"></i>
+                                                </button>
                                             </div>
                                             <div class="card-body">
                                                 <canvas id="graficoComparativo" height="100"></canvas>
@@ -409,16 +468,19 @@
 
                 <div class="tab-pane fade" id="prediccion-agua" role="tabpanel">
                     <div class="card mt-0 border-top-0 rounded-0">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5>Predicción de Consumo de Agua</h5>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="capturarYDescargar('prediccion-agua', 'Reporte_Prediccion_Agua')">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
                         </div>
                         <div class="card-body">
                             <div class="row mb-3">
                                 <div class="col-12">
                                     <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-primary" onclick="cargarPrediccion('valvula')">Solo Válvula</button>
-                                        <button type="button" class="btn btn-primary" onclick="cargarPrediccion('manual')">Solo Manual</button>
-                                        <button type="button" class="btn btn-primary" onclick="cargarPrediccion('ambos')">Consumo Total</button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="cargarPrediccion('valvula')">Solo Válvula</button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="cargarPrediccion('manual')">Solo Manual</button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="cargarPrediccion('ambos')">Consumo Total</button>
                                     </div>
                                 </div>
                             </div>
@@ -446,7 +508,17 @@
                                     </div>
                                 </div>
                             </div>
-
+                            
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-outline-secondary" onclick="cambiarTipoGraficaPrediccion('line')">Gráfica Lineal</button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="cambiarTipoGraficaPrediccion('bar')">Gráfica de Barras</button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="cambiarTipoGraficaPrediccion('radar')">Gráfica Radar</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div class="row">
                                 <div class="col-12">
                                     <div class="card">
@@ -463,10 +535,16 @@
                     </div>
                 </div>
 
-            </div> </div> </div> </div> <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            </div> </div> </div> </div> <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.1/dist/chartjs-adapter-moment.min.js"></script>
 <script>
     // Variables globales para gráficos
     var graficoSalud, graficoSecado, graficoComparativo;
+    var tipoGraficaPrediccion = 'line'; // Tipo de gráfica predeterminado para la predicción
+    var tipoGraficaComparativa = 'lineal'; // Tipo de gráfica predeterminado para la comparativa
     
     // Cargar datos cuando el documento esté listo
     $(document).ready(function() {
@@ -585,7 +663,7 @@
                         panelHtml += `
                             <div class="col-md-6 mb-4">
                                 <div class="card ${borderClass}">
-                                    <div class="card-header ${bgColorClass} text-white">
+                                    <div class="card-header ${bgColorClass} text-dark">
                                         <h5 class="mb-0">${cama.nombre}</h5>
                                     </div>
                                     <div class="card-body">
@@ -658,6 +736,13 @@
         $('#panel_informacion').hide();
         $('#panel_mensajes').hide();
         
+        // Reiniciar valores de consumo de agua
+        $('#consumo_agua_total').text('0');
+        $('#val_consumo_valvula').text('0');
+        $('#val_consumo_manual').text('0');
+        
+
+        
         // Cargar datos del ciclo seleccionado
         $.ajax({
             url: '/bi/datos-ciclo',
@@ -691,6 +776,9 @@
                 // Actualizar consumo de agua total (inicialmente con el valor total)
                 $('#consumo_agua_total').text(parseFloat(data.consumo_agua_total).toFixed(2));
                 
+                // Actualizar consumo de agua por tipo
+                $('#val_consumo_valvula').text(parseFloat(data.consumo_valvula).toFixed(2));
+                $('#val_consumo_manual').text(parseFloat(data.consumo_manual).toFixed(2));
                 
                 // Actualizar estado del ciclo y mostrar días restantes o completado
                 if (data.ciclo_completado) {
@@ -710,6 +798,8 @@
                         $('#estado_ciclo').html('<span class="badge badge-info" style="font-size: 1.2rem;">Ciclo en progreso</span>');
                     }
                 }
+                
+
             },
             error: function(xhr, status, error) {
                 console.log('Error al cargar datos del ciclo:', xhr.responseText); // Depuración
@@ -754,7 +844,7 @@
     function compararCiclos() {
         var cicloA = $('#ciclo_a').val();
         var cicloB = $('#ciclo_b').val();
-        var tipoGrafica = $('#tipo_grafica').val();
+        var tipoGrafica = tipoGraficaComparativa;
         var tipoDato = $('#tipo_dato').val();
         var tipoRiego = $('#tipo_riego').val();
         
@@ -1013,6 +1103,38 @@
         compararCiclos();
     });
     
+    // Función para seleccionar tipo de gráfica en comparativa histórica
+    function seleccionarTipoGrafica(tipo) {
+        tipoGraficaComparativa = tipo;
+        
+        // Actualizar estilos de botones
+        document.querySelectorAll('.btn-grafica-tipo').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+    }
+    
+    // Función para refrescar la gráfica comparativa sin recargar la página
+    function refrescarGraficaComparativa() {
+        // Obtener los valores actuales de los controles
+        var cicloA = $('#ciclo_a').val();
+        var cicloB = $('#ciclo_b').val();
+        var tipoDato = $('#tipo_dato').val();
+        var tipoRiego = $('#tipo_riego').val();
+        
+        // Verificar que los ciclos estén seleccionados
+        if (!cicloA || !cicloB) {
+            alert('Debe seleccionar ambos ciclos para refrescar la gráfica');
+            return;
+        }
+        
+        // Mostrar indicador de carga
+        $('#titulo_grafica').html('Gráfica de Comparación <i class="fas fa-spinner fa-spin"></i>');
+        
+        // Llamar a la función compararCiclos que ya maneja todos los parámetros
+        compararCiclos();
+    }
+    
     // Evento para activar pestaña de comparativa histórica
     $('#comparativa-historica-tab').on('shown.bs.tab', function (e) {
         cargarCiclosFinalizados();
@@ -1199,6 +1321,21 @@
     
     // Función para predicción de agua
     let graficaPrediccion = null;
+    
+    function cambiarTipoGraficaPrediccion(tipo) {
+        tipoGraficaPrediccion = tipo;
+        
+        // Actualizar estilos de botones
+        document.querySelectorAll('.btn-outline-secondary').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+        
+        // Recargar la gráfica con el nuevo tipo si ya hay datos
+        if (window.ultimoDatosPrediccion) {
+            actualizarGraficaPrediccion(window.ultimoDatosPrediccion.labels, window.ultimoDatosPrediccion.data);
+        }
+    }
 
     function cargarPrediccion(tipo) {
         fetch(`/bi/prediccion-agua?tipo=${tipo}`, {
@@ -1235,8 +1372,12 @@
             graficaPrediccion.destroy();
         }
         
-        graficaPrediccion = new Chart(ctx, {
-            type: 'line',
+        // Guardar los datos para poder recargar la gráfica con otro tipo
+        window.ultimoDatosPrediccion = { labels: labels, data: data };
+        
+        // Configurar la gráfica según el tipo
+        let chartConfig = {
+            type: tipoGraficaPrediccion,
             data: {
                 labels: labels,
                 datasets: [
@@ -1244,8 +1385,17 @@
                         label: 'Consumo por Ciclo',
                         data: data,
                         borderColor: 'rgb(54, 162, 235)',
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        fill: false,
+                        backgroundColor: function(context) {
+                            const chartType = context.chart.config.type;
+                            if (chartType === 'radar') {
+                                return 'rgba(54, 162, 235, 0.2)';
+                            }
+                            return 'rgba(54, 162, 235, 0.2)';
+                        },
+                        fill: function(context) {
+                            const chartType = context.chart.config.type;
+                            return chartType === 'radar' ? true : false;
+                        },
                         tension: 0.1,
                         pointRadius: function(context) {
                             var index = context.dataIndex;
@@ -1273,24 +1423,130 @@
                         display: true,
                         position: 'top',
                     }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Litros'
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Ciclo'
-                        }
-                    }
                 }
             }
+        };
+        
+        // Configuración específica para diferentes tipos de gráficas
+        if (tipoGraficaPrediccion === 'radar') {
+            chartConfig.options.scales = {
+                r: {
+                    beginAtZero: true,
+                    suggestedMin: 0,
+                    suggestedMax: Math.max(...data) * 1.2 // Establecer un máximo razonable
+                }
+            };
+        } else {
+            chartConfig.options.scales = {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Litros'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Ciclo'
+                    }
+                }
+            };
+        }
+        
+        graficaPrediccion = new Chart(ctx, chartConfig);
+    }
+
+    // Función para capturar y descargar reporte en PDF
+    async function capturarYDescargar(elementId, tituloArchivo) {
+        const element = document.getElementById(elementId);
+        if (!element) {
+            console.error('Elemento no encontrado:', elementId);
+            return;
+        }
+
+        // Ocultar temporalmente los botones de captura y carga para que no aparezcan en la imagen
+        const botonesCaptura = element.querySelectorAll('button[onclick*="capturarYDescargar"]');
+        const botonesCarga = element.querySelectorAll('button[id*="cargar"], button[id*="btn_"]');
+        const botonesDescarga = element.querySelectorAll('a[id*="descargar"]');
+        const botonesOriginales = [];
+        const botonesCargaOriginales = [];
+        const botonesDescargaOriginales = [];
+
+        // Guardar estado original y ocultar botones de captura
+        botonesCaptura.forEach(boton => {
+            botonesOriginales.push({ boton: boton, display: boton.style.display });
+            boton.style.display = 'none';
         });
+
+        // Guardar estado original y ocultar botones de carga
+        botonesCarga.forEach(boton => {
+            botonesCargaOriginales.push({ boton: boton, display: boton.style.display });
+            boton.style.display = 'none';
+        });
+
+        // Guardar estado original y ocultar botones de descarga
+        botonesDescarga.forEach(boton => {
+            botonesDescargaOriginales.push({ boton: boton, display: boton.style.display });
+            boton.style.display = 'none';
+        });
+
+        try {
+            // Esperar un poco para que los cambios se reflejen
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Capturar el elemento con html2canvas
+            const canvas = await html2canvas(element, {
+                scale: 2, // Mejor calidad
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: '#ffffff',
+                scrollX: 0,
+                scrollY: 0
+            });
+
+            // Obtener dimensiones del canvas
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+            const ratio = imgWidth / imgHeight;
+
+            // Crear PDF con jsPDF
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF(ratio > 1 ? 'landscape' : 'portrait'); // Orientación según proporción
+
+            // Calcular dimensiones para el PDF
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            let imgPdfHeight = (imgHeight * pdfWidth) / imgWidth;
+            
+            // Si la imagen es muy alta, calcular altura proporcional
+            if (imgPdfHeight > pdfHeight) {
+                imgPdfHeight = pdfHeight;
+            }
+
+            // Agregar imagen al PDF
+            const imgData = canvas.toDataURL('image/png');
+            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, imgPdfHeight);
+
+            // Descargar el PDF
+            pdf.save(tituloArchivo + '_' + new Date().toISOString().slice(0, 19).replace(/:/g, '-') + '.pdf');
+        } catch (error) {
+            console.error('Error al capturar y generar PDF:', error);
+            alert('Hubo un error al generar el reporte PDF. Por favor inténtelo de nuevo.');
+        } finally {
+            // Restaurar los botones a su estado original
+            botonesOriginales.forEach(item => {
+                item.boton.style.display = item.display;
+            });
+
+            botonesCargaOriginales.forEach(item => {
+                item.boton.style.display = item.display;
+            });
+
+            botonesDescargaOriginales.forEach(item => {
+                item.boton.style.display = item.display;
+            });
+        }
     }
 </script>
 @endsection

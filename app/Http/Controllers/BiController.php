@@ -507,6 +507,7 @@ class BiController extends Controller
         $fechaInicioPeriodo = Carbon::parse($ciclo->fechaInicio)->startOfDay();
         $fechaFinPeriodo = Carbon::parse($ciclo->fechaFin)->endOfDay();
         
+        // Intentar primero con la relación a través de cultivoId
         $volumenValvula = Valvula::whereIn('cultivoId', $cultivoIds)
             ->whereBetween('fechaEncendido', [$fechaInicioPeriodo, $fechaFinPeriodo])
             ->sum('volumen');
@@ -515,18 +516,36 @@ class BiController extends Controller
             ->whereBetween('fechaEncendido', [$fechaInicioPeriodo, $fechaFinPeriodo])
             ->sum('volumen');
         
-        // Si no hay datos en el periodo exacto, buscar en un rango ampliado (±30 días)
+        // Si no hay datos con la relación a cultivoId, buscar solo por fechas
         if ($volumenValvula == 0 && $volumenRiegoManual == 0) {
-            $fechaInicioAmpliada = date('Y-m-d H:i:s', strtotime($ciclo->fechaInicio . ' -30 days'));
-            $fechaFinAmpliada = date('Y-m-d H:i:s', strtotime($ciclo->fechaFin . ' +30 days'));
-            
-            $volumenValvula = Valvula::whereIn('cultivoId', $cultivoIds)
-                ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+            $volumenValvula = Valvula::whereBetween('fechaEncendido', [$fechaInicioPeriodo, $fechaFinPeriodo])
                 ->sum('volumen');
             
-            $volumenRiegoManual = RiegoManual::whereIn('cultivoId', $cultivoIds)
-                ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+            $volumenRiegoManual = RiegoManual::whereBetween('fechaEncendido', [$fechaInicioPeriodo, $fechaFinPeriodo])
                 ->sum('volumen');
+            
+            // Si aún no hay datos, buscar en un rango ampliado (±30 días)
+            if ($volumenValvula == 0 && $volumenRiegoManual == 0) {
+                $fechaInicioAmpliada = Carbon::parse($ciclo->fechaInicio)->subDays(30)->startOfDay();
+                $fechaFinAmpliada = Carbon::parse($ciclo->fechaFin)->addDays(30)->endOfDay();
+                
+                $volumenValvula = Valvula::whereIn('cultivoId', $cultivoIds)
+                    ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                    ->sum('volumen');
+                
+                $volumenRiegoManual = RiegoManual::whereIn('cultivoId', $cultivoIds)
+                    ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                    ->sum('volumen');
+                
+                // Si aún no hay datos con cultivoId, buscar solo por fechas ampliadas
+                if ($volumenValvula == 0 && $volumenRiegoManual == 0) {
+                    $volumenValvula = Valvula::whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                        ->sum('volumen');
+                    
+                    $volumenRiegoManual = RiegoManual::whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                        ->sum('volumen');
+                }
+            }
         }
         
         $consumoAguaTotal = $volumenValvula + $volumenRiegoManual;
@@ -542,6 +561,8 @@ class BiController extends Controller
             'dias_transcurridos' => $diasTranscurridos,
             'dias_restantes' => $diasRestantes,
             'consumo_agua_total' => $consumoAguaTotal,
+            'consumo_valvula' => $volumenValvula,
+            'consumo_manual' => $volumenRiegoManual,
             'ciclo_completado' => $cicloCompletado
         ]);
     }
