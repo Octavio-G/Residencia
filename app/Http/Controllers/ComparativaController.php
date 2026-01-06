@@ -64,21 +64,12 @@ class ComparativaController extends Controller
         $datosCicloB = $this->obtenerDatosNormalizados($cicloB, $tipoDato, $tipoRiego);
 
         return response()->json([
-            'ciclo_a' => [
-                'nombre' => $cicloA->descripcion,
-                'id' => $cicloA->cicloId,
-                'datos' => $datosCicloA
+            'datos' => [
+                'ciclo_a' => $datosCicloA,
+                'ciclo_b' => $datosCicloB
             ],
-            'ciclo_b' => [
-                'nombre' => $cicloB->descripcion,
-                'id' => $cicloB->cicloId,
-                'datos' => $datosCicloB
-            ],
-            'config' => [
-                'tipo_grafica' => $tipoGrafica,
-                'tipo_dato' => $tipoDato,
-                'tipo_riego' => $tipoRiego
-            ]
+            'ciclo_a_nombre' => $cicloA->descripcion,
+            'ciclo_b_nombre' => $cicloB->descripcion
         ]);
     }
 

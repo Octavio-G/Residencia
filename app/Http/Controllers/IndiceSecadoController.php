@@ -18,9 +18,8 @@ class IndiceSecadoController extends Controller
 
     public function calcularIndiceSecado()
     {
-        // Obtener los datos más recientes para ambas camas
-        $cama1 = $this->calcularDatosCama(CamaSiembra::class, 'Cama 1');
-        $cama2 = $this->calcularDatosCama(Cama2::class, 'Cama 2');
+        $cama1 = $this->calcularDatosCama(CamaSiembra::class, 'Cama 1', 'Cilantro');
+        $cama2 = $this->calcularDatosCama(Cama2::class, 'Cama 2', 'Rábano');
 
         return response()->json([
             'cama1' => $cama1,
@@ -28,12 +27,12 @@ class IndiceSecadoController extends Controller
         ]);
     }
 
-    private function calcularDatosCama($modelo, $nombreCama)
+    private function calcularDatosCama($modelo, $nombreCama, $tipoCultivo)
     {
-        // Obtener las últimas 10 lecturas de humedad para mostrar en la gráfica
+        // 1. Obtener historial (sin cambios, tu lógica estaba bien)
         $lecturas = $modelo::orderBy('fecha', 'desc')
             ->orderBy('hora', 'desc')
-            ->limit(10)
+            ->limit(20) // Aumenté a 20 para mejor gráfica
             ->get()
             ->map(function ($lectura) {
                 return [
@@ -42,76 +41,97 @@ class IndiceSecadoController extends Controller
                     'humedad' => $lectura->humedad
                 ];
             })
-            ->reverse() // Para mostrar en orden cronológico
+            ->reverse()
             ->values();
 
-        // Obtener la lectura más reciente
-        $lecturaReciente = $modelo::orderBy('fecha', 'desc')
-            ->orderBy('hora', 'desc')
-            ->first();
-
-        // Obtener la temperatura más reciente cercana a la fecha de la lectura
-        $temperatura = 0;
-        if ($lecturaReciente) {
-            $temperatura = $this->obtenerTemperaturaCercana($lecturaReciente->fecha);
-        }
-
-        // Calcular el tiempo estimado hasta que la humedad alcance niveles críticos
-        // Suponiendo una tasa de secado promedio (esto es una simplificación)
+        // 2. Obtener datos actuales
+        $lecturaReciente = $modelo::orderBy('fecha', 'desc')->orderBy('hora', 'desc')->first();
         $humedadActual = $lecturaReciente ? $lecturaReciente->humedad : 0;
-        $minutosRestantes = $this->calcularMinutosHastaSecado($humedadActual);
 
-        // Determinar mensaje de estado
-        $mensajeEstado = $this->obtenerMensajeEstado($humedadActual, $minutosRestantes);
+        // 3. Obtener Temperatura (CRÍTICO para la fórmula)
+        // Usamos la última registrada en general, ya que la temperatura ambiente afecta a ambas camas igual
+        $temperaturaModel = Temperatura::orderBy('fecha', 'desc')->orderBy('hora', 'desc')->first();
+        $temperaturaActual = $temperaturaModel ? $temperaturaModel->temperatura : 25; // Default 25°C
+
+        // 4. Calcular Predicción Inteligente
+        // Pasamos la temperatura actual para ajustar la velocidad
+        $minutosRestantes = $this->calcularMinutosHastaSecado($humedadActual, $temperaturaActual);
+
+        // 5. Determinar Mensajes y Estados
+        $mensajeEstado = $this->obtenerMensajeEstado($humedadActual, $minutosRestantes, $temperaturaActual);
 
         return [
             'nombre' => $nombreCama,
-            'cultivo' => 'Tomate', // Placeholder - debería obtenerse del modelo real
+            'cultivo' => $tipoCultivo,
             'humedad_actual' => $humedadActual,
-            'temperatura_actual' => $temperatura,
+            'temperatura_actual' => $temperaturaActual,
             'tiempo_restante' => [
                 'horas' => intval($minutosRestantes / 60),
-                'minutos' => $minutosRestantes % 60
+                'minutos' => $minutosRestantes % 60,
+                'total_minutos' => $minutosRestantes // Útil para lógica JS
             ],
             'mensaje_estado' => $mensajeEstado,
             'lecturas_historial' => $lecturas
         ];
     }
 
-    private function obtenerTemperaturaCercana($fecha)
+    /**
+     * Fórmula de Secado Hídrico con Ajuste Térmico
+     * Basada en el principio de evapotranspiración simplificada.
+     */
+    private function calcularMinutosHastaSecado($humedadActual, $temperatura)
     {
-        // Buscar temperatura registrada cerca de la fecha especificada
-        $temperatura = Temperatura::whereDate('fecha', $fecha)
-            ->orderBy('hora', 'desc')
-            ->first();
+        $limiteCritico = 30; // Tu límite rojo
 
-        return $temperatura ? $temperatura->temperatura : 25; // Valor por defecto
-    }
-
-    private function calcularMinutosHastaSecado($humedadActual)
-    {
-        // Simplificación: asumimos que la humedad disminuye a una tasa constante
-        // En una implementación real, esto dependería de múltiples factores
-        if ($humedadActual <= 30) {
-            return 0; // Ya está en nivel crítico
+        if ($humedadActual <= $limiteCritico) {
+            return 0;
         }
 
-        // Asumiendo que la humedad disminuye 1% cada 2 horas en condiciones normales
-        $tasaSecado = 0.5; // % por hora
-        $humedadADisminuir = $humedadActual - 30; // Hasta el nivel crítico
-        $horasHastaSecado = $humedadADisminuir / $tasaSecado;
+        // --- LA FÓRMULA MÁGICA ---
+        
+        // 1. Velocidad Base: En un día templado (20-24°C), la tierra pierde aprox 0.5% a 0.8% por hora
+        $velocidadBase = 0.6; 
 
-        return intval($horasHastaSecado * 60); // Convertir a minutos
+        // 2. Factor Térmico (El Acelerador)
+        // Si hay más de 25°C, aceleramos. Si hay menos, frenamos.
+        // Por cada grado extra, aumentamos la velocidad un 10%
+        $diferenciaTemp = $temperatura - 25; 
+        $factorAceleracion = 1 + ($diferenciaTemp * 0.10); 
+
+        // Limites de seguridad para el factor (para que no de negativo en fríos extremos)
+        if ($factorAceleracion < 0.5) $factorAceleracion = 0.5; // Mínimo mitad de velocidad
+        
+        // 3. Velocidad Final Ajustada
+        $tasaSecadoReal = $velocidadBase * $factorAceleracion;
+
+        // Ejemplo: 
+        // A 25°C -> Tasa = 0.6% por hora
+        // A 35°C -> Tasa = 1.2% por hora (Se seca el doble de rápido)
+
+        // 4. Cálculo de tiempo
+        $humedadPerdidaNecesaria = $humedadActual - $limiteCritico;
+        $horasRestantes = $humedadPerdidaNecesaria / $tasaSecadoReal;
+
+        return intval($horasRestantes * 60);
     }
 
-    private function obtenerMensajeEstado($humedadActual, $minutosRestantes)
+    private function obtenerMensajeEstado($humedadActual, $minutosRestantes, $temperatura)
     {
+        // Prioridad 1: Humedad Crítica
         if ($humedadActual <= 30) {
-            return "CRÍTICO: Humedad por debajo del 30%";
-        } elseif ($humedadActual <= 50) {
-            return "URGENTE: Riego recomendado pronto";
-        } else {
-            return "NORMAL: Niveles de humedad adecuados";
+            return "🔴 CRÍTICO: Suelo seco. Riego inmediato requerido.";
         }
+
+        // Prioridad 2: Alerta de Ola de Calor (Nuevo)
+        if ($temperatura >= 30 && $humedadActual < 50) {
+            return "⚠️ ALERTA CALOR: Evaporación acelerada. Prepare riego.";
+        }
+
+        // Prioridad 3: Advertencia estándar
+        if ($humedadActual <= 50) {
+            return "🟡 ADVERTENCIA: Nivel bajo. Monitorear.";
+        }
+
+        return "🟢 ÓPTIMO: Niveles de humedad y temperatura adecuados.";
     }
 }

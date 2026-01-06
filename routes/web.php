@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PrediccionController;
 use App\Http\Controllers\ComparativaController;
 use App\Http\Controllers\IndiceSecadoController;
+use App\Http\Controllers\PrediccionAguaController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -144,5 +145,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/prediccion/ciclos', [PrediccionController::class, 'getCiclos']);
         Route::get('/prediccion/opciones', [PrediccionController::class, 'getPrediccionesDisponibles']);
         Route::post('/prediccion/calcular', [PrediccionController::class, 'calcularPrediccion']);
+        
+        // Ruta para vista de predicción de agua
+        Route::get('/prediccion-agua-view', [PrediccionAguaController::class, 'index']);
+        // Ruta para la API de predicción (AJAX)
+        Route::get('/prediccion-agua', [PrediccionAguaController::class, 'predecir']);
     });
 });

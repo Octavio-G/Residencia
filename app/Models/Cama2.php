@@ -27,40 +27,42 @@ class Cama2 extends Model
     // Método para obtener el estado de salud basado en humedad
     public function getEstadoSaludAttribute()
     {
-        // Lógica de ponderación solo con humedad ya que es el único dato disponible
-        $riesgoHumedad = 0;
-        if ($this->humedad < 30) {
-            $riesgoHumedad = 100; // Muy bajo
-        } elseif ($this->humedad <= 50) {
-            $riesgoHumedad = 70; // Bajo
-        } elseif ($this->humedad > 100) {
-            $riesgoHumedad = 100; // Muy alto (teóricamente no debería pasar)
-        } elseif ($this->humedad > 60) {
-            $riesgoHumedad = 0; // Óptimo
-        } else {
-            $riesgoHumedad = 0; // Óptimo (entre 50-60)
-        }
-        
-        // Determinar color del semáforo
-        if ($riesgoHumedad >= 80) {
+        // Lógica basada en humedad con umbrales claros
+        if ($this->humedad <= 30) {
             return 'rojo'; // Crítico
-        } elseif ($riesgoHumedad >= 50) {
+        } elseif ($this->humedad > 30 && $this->humedad <= 60) {
             return 'amarillo'; // Advertencia
         } else {
-            return 'verde'; // Normal
+            return 'verde'; // Óptimo
         }
     }
 
     // Método para calcular tiempo estimado hasta el estrés hídrico
     public function getTiempoHastaEstresAttribute()
     {
-        // Como no tenemos tasa de secado, usaremos un valor por defecto
+        // Umbral crítico de humedad
         $umbralEstrés = 30; // Valor de humedad crítica
-        $tasaSecado = 2.0; // % por hora (valor estimado)
         
         if ($this->humedad <= $umbralEstrés) {
             return 0; // Ya en estrés
         }
+        
+        // Calcular tasa de secado basada en temperatura (más realista)
+        // Rango de 5-10% por día, convertido a porcentaje por hora
+        $tasaBase = 7.0; // % por día (promedio entre 5 y 10)
+        
+        // Ajustar tasa según temperatura
+        $temperatura = $this->temperatura;
+        if ($temperatura > 30) {
+            $factorTemperatura = 1.5; // Mayor tasa de secado con alta temperatura
+        } elseif ($temperatura > 25) {
+            $factorTemperatura = 1.2; // Temperatura moderadamente alta
+        } else {
+            $factorTemperatura = 1.0; // Temperatura normal
+        }
+        
+        // Convertir tasa diaria a tasa horaria
+        $tasaSecado = ($tasaBase * $factorTemperatura) / 24; // % por hora
         
         return ($this->humedad - $umbralEstrés) / $tasaSecado;
     }

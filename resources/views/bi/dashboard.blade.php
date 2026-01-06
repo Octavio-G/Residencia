@@ -5,7 +5,6 @@
     <div class="row">
         <div class="col-md-12">
             
-            <!-- Pestañas principales -->
             <ul class="nav nav-tabs" id="biTabs" role="tablist">
                 <li class="nav-item">
                     <a class="nav-link active" id="indicador-salud-tab" data-toggle="tab" href="#indicador-salud" role="tab">
@@ -13,6 +12,11 @@
                     </a>
                 </li>
 
+                <li class="nav-item">
+                    <a class="nav-link" id="indice-secado-tab" data-toggle="tab" href="#indice-secado" role="tab">
+                        <i class="fas fa-wind"></i> Índice de Secado
+                    </a>
+                </li>
 
                 <li class="nav-item">
                     <a class="nav-link" id="ciclos-siembra-tab" data-toggle="tab" href="#ciclos-siembra" role="tab">
@@ -27,17 +31,16 @@
                 </li>
                 
                 <li class="nav-item">
-                    <a class="nav-link" id="indice-secado-tab" data-toggle="tab" href="#indice-secado" role="tab">
-                        <i class="fas fa-wind"></i> Índice de Secado
+                    <a class="nav-link" id="prediccion-agua-tab" data-toggle="tab" href="#prediccion-agua" role="tab">
+                        <i class="fas fa-tint"></i> Predicción de Agua
                     </a>
                 </li>
             </ul>
             
-            <!-- Contenido de las pestañas -->
             <div class="tab-content" id="biTabsContent">
-                <!-- Pestaña 1: Indicador de Salud -->
+                
                 <div class="tab-pane fade show active" id="indicador-salud" role="tabpanel">
-                    <div class="card mt-1">
+                    <div class="card mt-0 border-top-0 rounded-0">
                         <div class="card-header">
                             <h5>Indicador de Salud de Camas de Siembra</h5>
                         </div>
@@ -45,12 +48,10 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div id="panel-camas" class="row">
-                                        <!-- Paneles de camas se cargarán aquí mediante AJAX -->
-                                    </div>
+                                        </div>
                                 </div>
                             </div>
                             
-                            <!-- Sección de historial de lecturas -->
                             <div class="row mt-4">
                                 <div class="col-md-12">
                                     <h5>Historial de Lecturas</h5>
@@ -96,15 +97,13 @@
                                                 <tr>
                                                     <th>Cama</th>
                                                     <th>Humedad (%)</th>
-                                                    <th>Temperatura (°C)</th>
                                                     <th>Fecha</th>
                                                     <th>Hora</th>
                                                     <th>Estado</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <!-- Datos se cargarán aquí -->
-                                            </tbody>
+                                                </tbody>
                                         </table>
                                     </div>
                                     
@@ -116,19 +115,96 @@
                         </div>
                     </div>
                 </div>
-                
 
-                
+                <div class="tab-pane fade" id="indice-secado" role="tabpanel">
+                    <div class="card mt-0 border-top-0 rounded-0">
+                        <div class="card-header">
+                            <h5>Índice de Secado</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <button class="btn btn-primary" id="btn-cargar-secado">
+                                        <i class="fas fa-sync-alt"></i> Actualizar Datos
+                                    </button>
+                                </div>
+                            </div>
 
-                
-                <!-- Pestaña 4: Ciclos de Siembra -->
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="card border-primary">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="mb-0">
+                                                <i class="fas fa-seedling"></i> 
+                                                <span id="cama1-nombre">Cama 1</span>
+                                                <small class="float-right">Cultivo: <span id="cama1-cultivo">Cargando...</span></small>
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="text-center mb-3">
+                                                <h3 id="cama1-tiempo-restante" class="text-success">
+                                                    <i class="fas fa-clock"></i> Cargando...
+                                                </h3>
+                                                <div id="cama1-mensaje-estado" class="alert alert-info mt-2">
+                                                    Cargando estado...
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <canvas id="grafica-cama1" height="200"></canvas>
+                                            </div>
+                                            
+                                            <div class="text-center">
+                                                <small class="text-muted">
+                                                    Temperatura actual: <span id="cama1-temperatura">0°C</span>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 mb-4">
+                                    <div class="card border-success">
+                                        <div class="card-header bg-success text-white">
+                                            <h5 class="mb-0">
+                                                <i class="fas fa-seedling"></i> 
+                                                <span id="cama2-nombre">Cama 2</span>
+                                                <small class="float-right">Cultivo: <span id="cama2-cultivo">Cargando...</span></small>
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="text-center mb-3">
+                                                <h3 id="cama2-tiempo-restante" class="text-success">
+                                                    <i class="fas fa-clock"></i> Cargando...
+                                                </h3>
+                                                <div id="cama2-mensaje-estado" class="alert alert-info mt-2">
+                                                    Cargando estado...
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="mb-3">
+                                                <canvas id="grafica-cama2" height="200"></canvas>
+                                            </div>
+                                            
+                                            <div class="text-center">
+                                                <small class="text-muted">
+                                                    Temperatura actual: <span id="cama2-temperatura">0°C</span>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="tab-pane fade" id="ciclos-siembra" role="tabpanel">
-                    <div class="card mt-1">
+                    <div class="card mt-0 border-top-0 rounded-0">
                         <div class="card-header">
                             <h5>Gestión de Ciclos de Siembra</h5>
                         </div>
                         <div class="card-body">
-                            <!-- Selector de Ciclos -->
                             <div class="card mb-4">
                                 <div class="card-header">
                                     <h5>Seleccionar Ciclo de Siembra</h5>
@@ -138,8 +214,7 @@
                                         <label for="ciclo_selector">Ciclo de Siembra:</label>
                                         <select class="form-control" id="ciclo_selector">
                                             <option value="">Seleccione un ciclo</option>
-                                            <!-- Opciones se cargarán dinámicamente -->
-                                        </select>
+                                            </select>
                                     </div>
                                     
                                     <button class="btn btn-primary" id="btn_cargar_datos">
@@ -148,17 +223,13 @@
                                 </div>
                             </div>
                             
-                            <!-- Panel de Mensajes -->
                             <div id="panel_mensajes" style="display: none;">
                                 <div class="alert alert-danger" id="mensaje_error">
-                                    <!-- Mensaje de error se cargará aquí -->
-                                </div>
+                                    </div>
                             </div>
                             
-                            <!-- Panel de Información del Ciclo -->
                             <div id="panel_informacion" style="display: none;">
                                 <div class="row">
-                                    <!-- Tarjeta de Información del Ciclo -->
                                     <div class="col-md-6 mb-4">
                                         <div class="card border-primary">
                                             <div class="card-header bg-primary text-white">
@@ -173,7 +244,6 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Tarjeta de Días Transcurridos -->
                                     <div class="col-md-6 mb-4">
                                         <div class="card border-info">
                                             <div class="card-header bg-info text-white">
@@ -186,7 +256,6 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Tarjeta de Días Restantes o Estado del Ciclo -->
                                     <div class="col-md-6 mb-4">
                                         <div class="card border-success" id="card_dias_restantes">
                                             <div class="card-header bg-success text-white">
@@ -209,9 +278,6 @@
                                         </div>
                                     </div>
                                     
-
-                                    
-                                    <!-- Tarjeta de Estado -->
                                     <div class="col-md-6 mb-4">
                                         <div class="card border-warning">
                                             <div class="card-header bg-warning text-white">
@@ -219,8 +285,7 @@
                                             </div>
                                             <div class="card-body text-center">
                                                 <div id="estado_ciclo">
-                                                    <!-- El estado se cargará aquí dinámicamente -->
-                                                </div>
+                                                    </div>
                                             </div>
                                         </div>
                                     </div>
@@ -229,223 +294,176 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-
-    <!-- Pestaña 3: Comparativa Histórica -->
-    <div class="tab-pane fade" id="comparativa-historica" role="tabpanel">
-        <div class="card mt-0 border-top-0 rounded-0">
-            <div class="card-header">
-                <h5>Comparativa Histórica de Ciclos de Siembra</h5>
-            </div>
-            <div class="card-body">
-
-                
-                <!-- Filtros de comparación -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h6>Filtros de Comparación</h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="ciclo_a">Ciclo A:</label>
-                                <select class="form-control" id="ciclo_a" name="ciclo_a">
-                                    <option value="">Seleccione un ciclo</option>
-                                    <!-- Opciones se cargarán dinámicamente -->
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="ciclo_b">Ciclo B:</label>
-                                <select class="form-control" id="ciclo_b" name="ciclo_b">
-                                    <option value="">Seleccione un ciclo</option>
-                                    <!-- Opciones se cargarán dinámicamente -->
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label for="tipo_grafica">Tipo de Gráfica:</label>
-                                <select class="form-control" id="tipo_grafica" name="tipo_grafica">
-                                    <option value="lineal">Lineal</option>
-                                    <option value="barra">Barra</option>
-                                    <option value="radar">Radar</option>
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label>&nbsp;</label>
-                                <button type="button" class="btn btn-primary form-control" id="btn-comparar-completo">
-                                    <i class="fas fa-sync-alt"></i> Comparar
-                                </button>
-                            </div>
+                <div class="tab-pane fade" id="comparativa-historica" role="tabpanel">
+                    <div class="card mt-0 border-top-0 rounded-0">
+                        <div class="card-header">
+                            <h5>Comparativa Histórica de Ciclos de Siembra</h5>
                         </div>
-                        <div class="row mt-3">
-                            <div class="col-md-4">
-                                <label for="tipo_dato">Tipo de Dato:</label>
-                                <select class="form-control" id="tipo_dato" name="tipo_dato">
-                                    <option value="humedad_cama1">Humedad Cama 1</option>
-                                    <option value="humedad_cama2">Humedad Cama 2</option>
-                                    <option value="consumo_agua">Consumo de Agua</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4" id="tipo_riego_container" style="display: none;">
-                                <label for="tipo_riego">Tipo de Riego:</label>
-                                <select class="form-control" id="tipo_riego" name="tipo_riego">
-                                    <option value="manual">Riego Manual</option>
-                                    <option value="valvula">Válvula</option>
-                                    <option value="ambos">Ambos</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Mensaje de error -->
-                <div id="panel_mensajes_comparativa" style="display: none;">
-                    <div class="alert alert-danger" id="mensaje_error_comparativa">
-                        <!-- Mensaje de error se cargará aquí -->
-                    </div>
-                </div>
-                
-                <!-- Gráficas de comparación (ocultas inicialmente) -->
-                <div id="graficas_comparativa" style="display: none;">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h5>Resultados de Comparación</h5>
-                        </div>
-                    </div>
-                    
-                    <!-- Contenedor para gráfica principal -->
-                    <div class="row mb-4">
-                        <div class="col-md-12">
-                            <div class="card">
-                                <div class="card-header bg-primary text-white">
-                                    <h6 class="mb-0" id="titulo_grafica">Gráfica de Comparación</h6>
+                        <div class="card-body">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    <h6>Filtros de Comparación</h6>
                                 </div>
                                 <div class="card-body">
-                                    <canvas id="graficoComparativo" height="100"></canvas>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <label for="ciclo_a">Ciclo A:</label>
+                                            <select class="form-control" id="ciclo_a" name="ciclo_a">
+                                                <option value="">Seleccione un ciclo</option>
+                                                </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="ciclo_b">Ciclo B:</label>
+                                            <select class="form-control" id="ciclo_b" name="ciclo_b">
+                                                <option value="">Seleccione un ciclo</option>
+                                                </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label for="tipo_grafica">Tipo de Gráfica:</label>
+                                            <select class="form-control" id="tipo_grafica" name="tipo_grafica">
+                                                <option value="lineal">Lineal</option>
+                                                <option value="barra">Barra</option>
+                                                <option value="radar">Radar</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label>&nbsp;</label>
+                                            <button type="button" class="btn btn-primary form-control" id="btn-comparar-completo">
+                                                <i class="fas fa-sync-alt"></i> Comparar
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-4">
+                                            <label for="tipo_dato">Tipo de Dato:</label>
+                                            <select class="form-control" id="tipo_dato" name="tipo_dato">
+                                                <option value="humedad_cama1">Humedad Cama 1</option>
+                                                <option value="humedad_cama2">Humedad Cama 2</option>
+                                                <option value="consumo_agua">Consumo de Agua</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4" id="tipo_riego_container" style="display: none;">
+                                            <label for="tipo_riego">Tipo de Riego:</label>
+                                            <select class="form-control" id="tipo_riego" name="tipo_riego">
+                                                <option value="manual">Riego Manual</option>
+                                                <option value="valvula">Válvula</option>
+                                                <option value="ambos">Ambos</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Contenedor para gráficas adicionales (pastel) -->
-                    <div class="row mb-4" id="graficas_adicionales" style="display: none;">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header bg-success text-white">
-                                    <h6 class="mb-0">Ciclo A - Distribución de Riego</h6>
-                                </div>
-                                <div class="card-body text-center">
-                                    <canvas id="graficoPastelCicloA" height="200"></canvas>
-                                </div>
+                            
+                            <div id="panel_mensajes_comparativa" style="display: none;">
+                                <div class="alert alert-danger" id="mensaje_error_comparativa">
+                                    </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header bg-info text-white">
-                                    <h6 class="mb-0">Ciclo B - Distribución de Riego</h6>
-                                </div>
-                                <div class="card-body text-center">
-                                    <canvas id="graficoPastelCicloB" height="200"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pestaña 4: Índice de Secado -->
-    <div class="tab-pane fade" id="indice-secado" role="tabpanel">
-        <div class="card mt-0 border-top-0 rounded-0">
-            <div class="card-header">
-                <h5>Índice de Secado</h5>
-            </div>
-            <div class="card-body">
-                <div class="row mb-4">
-                    <div class="col-12">
-                        <button class="btn btn-primary" id="btn-cargar-secado">
-                            <i class="fas fa-sync-alt"></i> Actualizar Datos
-                        </button>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- Panel Cama 1 -->
-                    <div class="col-md-6 mb-4">
-                        <div class="card border-primary">
-                            <div class="card-header bg-primary text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-seedling"></i> 
-                                    <span id="cama1-nombre">Cama 1</span>
-                                    <small class="float-right">Cultivo: <span id="cama1-cultivo">Cargando...</span></small>
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="text-center mb-3">
-                                    <h3 id="cama1-tiempo-restante" class="text-success">
-                                        <i class="fas fa-clock"></i> Cargando...
-                                    </h3>
-                                    <div id="cama1-mensaje-estado" class="alert alert-info mt-2">
-                                        Cargando estado...
+                            
+                            <div id="graficas_comparativa" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h5>Resultados de Comparación</h5>
                                     </div>
                                 </div>
                                 
-                                <div class="mb-3">
-                                    <canvas id="grafica-cama1" height="200"></canvas>
-                                </div>
-                                
-                                <div class="text-center">
-                                    <small class="text-muted">
-                                        Temperatura actual: <span id="cama1-temperatura">0°C</span>
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Panel Cama 2 -->
-                    <div class="col-md-6 mb-4">
-                        <div class="card border-success">
-                            <div class="card-header bg-success text-white">
-                                <h5 class="mb-0">
-                                    <i class="fas fa-seedling"></i> 
-                                    <span id="cama2-nombre">Cama 2</span>
-                                    <small class="float-right">Cultivo: <span id="cama2-cultivo">Cargando...</span></small>
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="text-center mb-3">
-                                    <h3 id="cama2-tiempo-restante" class="text-success">
-                                        <i class="fas fa-clock"></i> Cargando...
-                                    </h3>
-                                    <div id="cama2-mensaje-estado" class="alert alert-info mt-2">
-                                        Cargando estado...
+                                <div class="row mb-4">
+                                    <div class="col-md-12">
+                                        <div class="card">
+                                            <div class="card-header bg-primary text-white">
+                                                <h6 class="mb-0" id="titulo_grafica">Gráfica de Comparación</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <canvas id="graficoComparativo" height="100"></canvas>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 
-                                <div class="mb-3">
-                                    <canvas id="grafica-cama2" height="200"></canvas>
-                                </div>
-                                
-                                <div class="text-center">
-                                    <small class="text-muted">
-                                        Temperatura actual: <span id="cama2-temperatura">0°C</span>
-                                    </small>
+                                <div class="row mb-4" id="graficas_adicionales" style="display: none;">
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header bg-success text-white">
+                                                <h6 class="mb-0">Ciclo A - Distribución de Riego</h6>
+                                            </div>
+                                            <div class="card-body text-center">
+                                                <canvas id="graficoPastelCicloA" height="200"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card">
+                                            <div class="card-header bg-info text-white">
+                                                <h6 class="mb-0">Ciclo B - Distribución de Riego</h6>
+                                            </div>
+                                            <div class="card-body text-center">
+                                                <canvas id="graficoPastelCicloB" height="200"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Scripts para funcionalidad BI -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <div class="tab-pane fade" id="prediccion-agua" role="tabpanel">
+                    <div class="card mt-0 border-top-0 rounded-0">
+                        <div class="card-header">
+                            <h5>Predicción de Consumo de Agua</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-primary" onclick="cargarPrediccion('valvula')">Solo Válvula</button>
+                                        <button type="button" class="btn btn-primary" onclick="cargarPrediccion('manual')">Solo Manual</button>
+                                        <button type="button" class="btn btn-primary" onclick="cargarPrediccion('ambos')">Consumo Total</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="card bg-light">
+                                        <div class="card-body text-center">
+                                            <h3 id="mensaje-prediccion">Seleccione un tipo de riego para ver la predicción</h3>
+                                            <div class="row mt-2">
+                                                <div class="col-md-4">
+                                                    <h5>Promedio Diario</h5>
+                                                    <p class="text-muted" id="promedio-diario">-</p>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <h5>Temperatura Actual</h5>
+                                                    <p class="text-muted" id="temperatura-actual">-</p>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <h5>Predicción</h5>
+                                                    <p class="text-muted" id="prediccion-valor">-</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>Historial y Predicción de Consumo de Agua</h5>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <canvas id="grafica-prediccion" width="400" height="200"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div> </div> </div> </div> <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Variables globales para gráficos
     var graficoSalud, graficoSecado, graficoComparativo;
@@ -479,8 +497,6 @@
             cargarHistorialLecturas();
         });
         
-
-        
         // Event listener para el botón de cargar datos de ciclos
         $('#btn_cargar_datos').click(function() {
             cargarDatosCiclo();
@@ -502,25 +518,24 @@
                         // Determinar estado basado en humedad
                         var estado = '';
                         var estadoClass = '';
-                        if (lectura.humedad < 30) {
+                        if (lectura.humedad <= 30) {  // ROJO (Crítico): humedad <= 30
                             estado = 'Crítico';
-                            estadoClass = 'badge-danger';
-                        } else if (lectura.humedad <= 50) {
+                            estadoClass = 'estado-critico';
+                        } else if (lectura.humedad > 30 && lectura.humedad <= 60) {  // AMARILLO (Advertencia): humedad > 30 Y humedad <= 60
                             estado = 'Advertencia';
-                            estadoClass = 'badge-warning';
-                        } else {
+                            estadoClass = 'estado-advertencia';
+                        } else {  // VERDE (Óptimo): humedad > 60
                             estado = 'Óptimo';
-                            estadoClass = 'badge-success';
+                            estadoClass = 'estado-optimo';
                         }
                         
                         var row = `
                             <tr>
                                 <td>${lectura.cama}</td>
                                 <td>${lectura.humedad}%</td>
-                                <td>${lectura.temperatura || 'N/A'}</td>
                                 <td>${lectura.fecha}</td>
                                 <td>${lectura.hora}</td>
-                                <td><span class="badge ${estadoClass}">${estado}</span></td>
+                                <td><span class="estado-badge ${estadoClass}">${estado}</span></td>
                             </tr>
                         `;
                         tbody.append(row);
@@ -552,20 +567,24 @@
                         // Determinar clase de color según el estado
                         var colorClass = '';
                         var bgColorClass = '';
+                        var borderClass = '';
                         if (cama.color === 'rojo') {
                             colorClass = 'text-danger';
-                            bgColorClass = 'bg-danger';
+                            bgColorClass = 'estado-critico';
+                            borderClass = 'border-danger';
                         } else if (cama.color === 'amarillo') {
                             colorClass = 'text-warning';
-                            bgColorClass = 'bg-warning';
+                            bgColorClass = 'estado-advertencia';
+                            borderClass = 'border-warning';
                         } else {
                             colorClass = 'text-success';
-                            bgColorClass = 'bg-success';
+                            bgColorClass = 'estado-optimo';
+                            borderClass = 'border-success';
                         }
                         
                         panelHtml += `
                             <div class="col-md-6 mb-4">
-                                <div class="card border-${cama.color}">
+                                <div class="card ${borderClass}">
                                     <div class="card-header ${bgColorClass} text-white">
                                         <h5 class="mb-0">${cama.nombre}</h5>
                                     </div>
@@ -598,8 +617,6 @@
             },
             error: function(xhr, status, error) {
                 console.log('Error al cargar el indicador de salud:', error);
-                console.log('Status:', status);
-                console.log('Response:', xhr.responseText);
                 $('#panel-camas').html('<div class="col-md-12"><p class="text-center text-danger">Error al cargar los datos: ' + error + '</p></div>');
             }
         });
@@ -674,9 +691,6 @@
                 // Actualizar consumo de agua total (inicialmente con el valor total)
                 $('#consumo_agua_total').text(parseFloat(data.consumo_agua_total).toFixed(2));
                 
-
-                
-
                 
                 // Actualizar estado del ciclo y mostrar días restantes o completado
                 if (data.ciclo_completado) {
@@ -732,6 +746,96 @@
                 console.log('Error al cargar ciclos finalizados:', xhr.responseText);
                 $('#ciclo_a').html('<option value="">Error al cargar ciclos</option>');
                 $('#ciclo_b').html('<option value="">Error al cargar ciclos</option>');
+            }
+        });
+    }
+    
+    // Función para comparar ciclos
+    function compararCiclos() {
+        var cicloA = $('#ciclo_a').val();
+        var cicloB = $('#ciclo_b').val();
+        var tipoGrafica = $('#tipo_grafica').val();
+        var tipoDato = $('#tipo_dato').val();
+        var tipoRiego = $('#tipo_riego').val();
+        
+        if (!cicloA || !cicloB) {
+            $('#mensaje_error_comparativa').text('Debe seleccionar ambos ciclos');
+            $('#panel_mensajes_comparativa').show();
+            return;
+        }
+        
+        // Ocultar mensajes de error anteriores
+        $('#panel_mensajes_comparativa').hide();
+        
+        // Mostrar indicador de carga
+        $('#btn-comparar-completo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Cargando...');
+        
+        // Determinar si se necesita obtener totales para gráficas de pastel
+        var url = '/bi/comparativa/comparar';
+        var data = {
+            ciclo_a: cicloA,
+            ciclo_b: cicloB,
+            tipo_grafica: tipoGrafica,
+            tipo_dato: tipoDato,
+            tipo_riego: tipoRiego,
+            _token: '{{ csrf_token() }}'
+        };
+        
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: data,
+            success: function(response) {
+                // Ocultar gráficas adicionales
+                $('#graficas_adicionales').hide();
+                
+                // Actualizar título de la gráfica
+                var titulo = 'Comparación de ';
+                if (tipoDato === 'humedad') {
+                    titulo += 'Humedad Promedio (Cama 1 y 2)';
+                } else if (tipoDato === 'humedad_cama1') {
+                    titulo += 'Humedad Cama 1';
+                } else if (tipoDato === 'humedad_cama2') {
+                    titulo += 'Humedad Cama 2';
+                } else if (tipoDato === 'consumo_agua') {
+                    titulo += 'Consumo de Agua';
+                }
+                titulo += ' - ' + tipoGrafica.charAt(0).toUpperCase() + tipoGrafica.slice(1);
+                $('#titulo_grafica').text(titulo);
+                
+                // Mostrar gráfica
+                $('#graficas_comparativa').show();
+                
+                // Crear gráfica según el tipo seleccionado
+                var etiquetaCicloA = response.ciclo_a_nombre;
+                var etiquetaCicloB = response.ciclo_b_nombre;
+                
+                switch (tipoGrafica) {
+                    case 'lineal':
+                        crearGraficaLineal(response.datos.ciclo_a, response.datos.ciclo_b, titulo, etiquetaCicloA, etiquetaCicloB);
+                        break;
+                    case 'barras':
+                        crearGraficaBarras(response.datos.ciclo_a, response.datos.ciclo_b, titulo, etiquetaCicloA, etiquetaCicloB);
+                        break;
+                    case 'radar':
+                        crearGraficaRadar(response.datos.ciclo_a, response.datos.ciclo_b, titulo, etiquetaCicloA, etiquetaCicloB);
+                        break;
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log('Error al comparar ciclos:', xhr.responseText);
+                var errorMessage = 'Error al comparar ciclos';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMessage = xhr.responseJSON.error;
+                } else if (xhr.responseText) {
+                    errorMessage = 'Error: ' + xhr.responseText;
+                }
+                $('#mensaje_error_comparativa').text(errorMessage);
+                $('#panel_mensajes_comparativa').show();
+            },
+            complete: function() {
+                // Restaurar botón
+                $('#btn-comparar-completo').prop('disabled', false).html('<i class="fas fa-sync-alt"></i> Comparar');
             }
         });
     }
@@ -900,96 +1004,6 @@
                         }
                     }
                 }
-            }
-        });
-    }
-    
-    // Función para comparar ciclos
-    function compararCiclos() {
-        var cicloA = $('#ciclo_a').val();
-        var cicloB = $('#ciclo_b').val();
-        var tipoGrafica = $('#tipo_grafica').val();
-        var tipoDato = $('#tipo_dato').val();
-        var tipoRiego = $('#tipo_riego').val();
-        
-        if (!cicloA || !cicloB) {
-            $('#mensaje_error_comparativa').text('Debe seleccionar ambos ciclos');
-            $('#panel_mensajes_comparativa').show();
-            return;
-        }
-        
-        // Ocultar mensajes de error anteriores
-        $('#panel_mensajes_comparativa').hide();
-        
-        // Mostrar indicador de carga
-        $('#btn-comparar-completo').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Cargando...');
-        
-        // Determinar si se necesita obtener totales para gráficas de pastel
-        var url = '/bi/comparativa/comparar';
-        var data = {
-            ciclo_a: cicloA,
-            ciclo_b: cicloB,
-            tipo_grafica: tipoGrafica,
-            tipo_dato: tipoDato,
-            tipo_riego: tipoRiego,
-            _token: '{{ csrf_token() }}'
-        };
-        
-        $.ajax({
-            url: url,
-            method: 'POST',
-            data: data,
-            success: function(response) {
-                // Ocultar gráficas adicionales
-                $('#graficas_adicionales').hide();
-                
-                // Actualizar título de la gráfica
-                var titulo = 'Comparación de ';
-                if (tipoDato === 'humedad') {
-                    titulo += 'Humedad Promedio (Cama 1 y 2)';
-                } else if (tipoDato === 'humedad_cama1') {
-                    titulo += 'Humedad Cama 1';
-                } else if (tipoDato === 'humedad_cama2') {
-                    titulo += 'Humedad Cama 2';
-                } else if (tipoDato === 'consumo_agua') {
-                    titulo += 'Consumo de Agua';
-                }
-                titulo += ' - ' + tipoGrafica.charAt(0).toUpperCase() + tipoGrafica.slice(1);
-                $('#titulo_grafica').text(titulo);
-                
-                // Mostrar gráfica
-                $('#graficas_comparativa').show();
-                
-                // Crear gráfica según el tipo seleccionado
-                var etiquetaCicloA = response.ciclo_a.nombre;
-                var etiquetaCicloB = response.ciclo_b.nombre;
-                
-                switch (tipoGrafica) {
-                    case 'lineal':
-                        crearGraficaLineal(response.ciclo_a.datos, response.ciclo_b.datos, titulo, etiquetaCicloA, etiquetaCicloB);
-                        break;
-                    case 'barra':
-                        crearGraficaBarras(response.ciclo_a.datos, response.ciclo_b.datos, titulo, etiquetaCicloA, etiquetaCicloB);
-                        break;
-                    case 'radar':
-                        crearGraficaRadar(response.ciclo_a.datos, response.ciclo_b.datos, titulo, etiquetaCicloA, etiquetaCicloB);
-                        break;
-                }
-            },
-            error: function(xhr, status, error) {
-                console.log('Error al comparar ciclos:', xhr.responseText);
-                var errorMessage = 'Error al comparar ciclos';
-                if (xhr.responseJSON && xhr.responseJSON.error) {
-                    errorMessage = xhr.responseJSON.error;
-                } else if (xhr.responseText) {
-                    errorMessage = 'Error: ' + xhr.responseText;
-                }
-                $('#mensaje_error_comparativa').text(errorMessage);
-                $('#panel_mensajes_comparativa').show();
-            },
-            complete: function() {
-                // Restaurar botón
-                $('#btn-comparar-completo').prop('disabled', false).html('<i class="fas fa-sync-alt"></i> Comparar');
             }
         });
     }
@@ -1174,9 +1188,6 @@
     $(document).ready(function() {
         // Escuchar el evento cuando se hace clic en una pestaña
         $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
-            // e.target es la nueva pestaña activada
-            // e.relatedTarget es la pestaña anterior
-            
             // FORZAR LIMPIEZA: Remover clases 'show' y 'active' de todos los paneles
             $('.tab-pane').removeClass('show active');
             
@@ -1185,5 +1196,101 @@
             $(targetId).addClass('show active');
         });
     });
+    
+    // Función para predicción de agua
+    let graficaPrediccion = null;
+
+    function cargarPrediccion(tipo) {
+        fetch(`/bi/prediccion-agua?tipo=${tipo}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error('Error del servidor:', data.error);
+                alert('Error del servidor: ' + data.error);
+                return;
+            }
+            
+            document.getElementById('mensaje-prediccion').textContent = data.mensaje;
+            document.getElementById('promedio-diario').textContent = data.promedio_historico.toFixed(2) + ' L';
+            document.getElementById('temperatura-actual').textContent = data.temperature + '°C';
+            document.getElementById('prediccion-valor').textContent = data.prediction.toFixed(2) + ' L';
+            
+            actualizarGraficaPrediccion(data.labels, data.data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al cargar los datos de predicción');
+        });
+    }
+
+    function actualizarGraficaPrediccion(labels, data) {
+        const ctx = document.getElementById('grafica-prediccion').getContext('2d');
+        
+        if (graficaPrediccion) {
+            graficaPrediccion.destroy();
+        }
+        
+        graficaPrediccion = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Consumo por Ciclo',
+                        data: data,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        fill: false,
+                        tension: 0.1,
+                        pointRadius: function(context) {
+                            var index = context.dataIndex;
+                            return index === context.dataset.data.length - 1 ? 8 : 4;
+                        },
+                        pointBackgroundColor: function(context) {
+                            var index = context.dataIndex;
+                            return index === context.dataset.data.length - 1 ? 'rgb(255, 99, 132)' : 'rgb(54, 162, 235)';
+                        },
+                        pointHoverRadius: function(context) {
+                            var index = context.dataIndex;
+                            return index === context.dataset.data.length - 1 ? 10 : 6;
+                        }
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Historial y Predicción de Consumo de Agua'
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Litros'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Ciclo'
+                        }
+                    }
+                }
+            }
+        });
+    }
 </script>
 @endsection

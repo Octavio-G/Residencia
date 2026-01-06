@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,7 +26,7 @@ class Temperatura extends Model
         'temperatura' => 'decimal:2',
         'humedad' => 'decimal:2',
         'fecha' => 'date',
-        'hora' => 'time',
+        // Eliminé el cast inválido 'hora' => 'time'
     ];
 
     // Relación con el cultivo
