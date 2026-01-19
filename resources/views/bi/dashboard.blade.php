@@ -48,7 +48,7 @@
                                     <i class="fas fa-question-circle"></i> ¿Cómo funciona?
                                 </button>
                                 <button class="btn btn-sm btn-outline-secondary ml-2" onclick="capturarYDescargar('indicador-salud', 'Reporte_Salud')">
-                                    <i class="fas fa-download"></i> Descargar
+                                    <i class="fas fa-camera"></i> Capturar
                                 </button>
                             </div>
                         </div>
@@ -133,7 +133,7 @@
                                     <i class="fas fa-question-circle"></i> ¿Cómo funciona?
                                 </button>
                                 <button class="btn btn-sm btn-outline-secondary ml-2" onclick="capturarYDescargar('indice-secado', 'Reporte_Indice_Secado')">
-                                    <i class="fas fa-download"></i> Descargar
+                                    <i class="fas fa-camera"></i> Capturar
                                 </button>
                             </div>
                         </div>
@@ -224,7 +224,7 @@
                                     <i class="fas fa-question-circle"></i> ¿Cómo funciona?
                                 </button>
                                 <button class="btn btn-sm btn-outline-secondary ml-2" onclick="capturarYDescargar('ciclos-siembra', 'Reporte_Ciclos_Siembra')">
-                                    <i class="fas fa-download"></i> Descargar
+                                    <i class="fas fa-camera"></i> Capturar
                                 </button>
                             </div>
                         </div>
@@ -247,40 +247,81 @@
                                 </div>
                             </div>
                             
+
+                            
+                            <!-- Panel de Estado del Ciclo (Centrado en la parte superior) -->
+                            <div class="row justify-content-center mb-4">
+                                <div class="col-md-8">
+                                    <div class="card border-warning">
+                                        <div class="card-header bg-warning text-white text-center">
+                                            <h5 class="mb-0">Estado del Ciclo</h5>
+                                        </div>
+                                        <div class="card-body text-center">
+                                            <div id="estado_ciclo">
+                                                <span class="badge badge-secondary" style="font-size: 1.2rem;">Seleccione un ciclo para ver el estado</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <div id="panel_mensajes" style="display: none;">
                                 <div class="alert alert-danger" id="mensaje_error">
                                     </div>
                             </div>
                             
                             <div id="panel_informacion" style="display: none;">
-                                <div class="row">
-                                    <div class="col-md-6 mb-4">
+                                <div class="row justify-content-center">
+                                    <div class="col-md-8 mb-4">
                                         <div class="card border-primary">
-                                            <div class="card-header bg-primary text-white">
+                                            <div class="card-header bg-primary text-white text-center">
                                                 <h5 class="mb-0">Información del Ciclo</h5>
                                             </div>
                                             <div class="card-body">
-                                                <h4 id="nombre_ciclo"></h4>
-                                                <p><strong>Fecha de Inicio:</strong> <span id="fecha_inicio"></span></p>
-                                                <p><strong>Fecha de Fin:</strong> <span id="fecha_fin"></span></p>
-                                                <p><strong>Estado:</strong> <span id="estado"></span></p>
+                                                <h4 id="nombre_ciclo" class="text-center"></h4>
+                                                <p class="text-center"><strong>Fecha de Inicio:</strong> <span id="fecha_inicio"></span></p>
+                                                <p class="text-center"><strong>Fecha de Fin:</strong> <span id="fecha_fin"></span></p>
+                                                <p class="text-center"><strong>Estado:</strong> <span id="estado"></span></p>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card border-info">
-                                            <div class="card-header bg-info text-white">
-                                                <h5 class="mb-0">Días Transcurridos</h5>
+
+                                    
+                                    <!-- Panel Combinado: Días Transcurridos y Estado del Ciclo -->
+                                    <div class="col-md-12 mb-4">
+                                        <div class="card border-success">
+                                            <div class="card-header bg-success text-white">
+                                                <h5 class="mb-0 text-center">Progreso del Ciclo</h5>
                                             </div>
-                                            <div class="card-body text-center">
-                                                <h2 id="dias_transcurridos" class="display-4">0</h2>
-                                                <p class="text-muted">días</p>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <!-- Columna Izquierda: Días Transcurridos -->
+                                                    <div class="col-md-6 text-center border-right">
+                                                        <h5 class="text-success">
+                                                            <i class="fas fa-calendar-day"></i> Días Transcurridos
+                                                        </h5>
+                                                        <h2 id="dias_transcurridos" class="display-4 text-success">0</h2>
+                                                        <p class="text-muted">días</p>
+                                                    </div>
+                                                    
+                                                    <!-- Columna Derecha: Ciclo Completado (Estilo Limpio) -->
+                                                    <div class="col-md-6 text-center d-none" id="card_ciclo_completado">
+                                                        <h5 class="text-success mb-3">
+                                                            <i class="fas fa-check-circle mr-2"></i>Ciclo Completado
+                                                        </h5>
+                                                        <h2 class="text-success font-weight-bold">100%</h2>
+                                                        <p class="text-muted small">Listo para cosecha</p>
+                                                    </div>
+                                                    
+
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-6 mb-4">
+                                    <!-- Panel Original de Días Restantes (se mantiene separado) -->
+                                    <div class="col-md-12 mb-4">
                                         <div class="card border-success" id="card_dias_restantes">
                                             <div class="card-header bg-success text-white">
                                                 <h5 class="mb-0">Días Restantes</h5>
@@ -290,81 +331,21 @@
                                                 <p class="text-muted">días</p>
                                             </div>
                                         </div>
-                                        <div class="card border-success d-none" id="card_ciclo_completado">
-                                            <div class="card-header bg-success text-white">
-                                                <h5 class="mb-0">Estado del Ciclo</h5>
-                                            </div>
-                                            <div class="card-body text-center">
-                                                <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-                                                <h4 class="text-success">Ciclo Completado</h4>
-                                                <p class="text-muted">Listo para cosecha</p>
-                                            </div>
-                                        </div>
+
                                     </div>
                                     
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card border-warning">
-                                            <div class="card-header bg-warning text-white">
-                                                <h5 class="mb-0">Estado del Ciclo</h5>
-                                            </div>
-                                            <div class="card-body text-center">
-                                                <div id="estado_ciclo">
-                                                    </div>
-                                            </div>
-                                        </div>
-                                    </div>
+
                                     
-                                    <!-- Tarjeta de Consumo de Válvula -->
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card border-info">
-                                            <div class="card-header bg-info text-white">
-                                                <h5 class="mb-0">
-                                                    <i class="fas fa-faucet"></i> Consumo Válvula
-                                                </h5>
-                                            </div>
-                                            <div class="card-body text-center">
-                                                <h3 id="val_consumo_valvula" class="display-4">0</h3>
-                                                <p class="text-muted">Litros</p>
-                                            </div>
-                                        </div>
-                                    </div>
+
                                     
-                                    <!-- Tarjeta de Consumo Manual -->
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card border-warning">
-                                            <div class="card-header bg-warning text-white">
-                                                <h5 class="mb-0">
-                                                    <i class="fas fa-hand-holding-water"></i> Consumo Manual
-                                                </h5>
-                                            </div>
-                                            <div class="card-body text-center">
-                                                <h3 id="val_consumo_manual" class="display-4">0</h3>
-                                                <p class="text-muted">Litros</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Tarjeta de Consumo Total -->
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card border-success">
-                                            <div class="card-header bg-success text-white">
-                                                <h5 class="mb-0">
-                                                    <i class="fas fa-water"></i> Consumo Total
-                                                </h5>
-                                            </div>
-                                            <div class="card-body text-center">
-                                                <h3 id="consumo_agua_total" class="display-4">0</h3>
-                                                <p class="text-muted">Litros</p>
-                                            </div>
-                                        </div>
-                                    </div>
+
                                     
                                     <!-- Tarjeta de Riego por Tipo -->
                                     <div class="col-md-12 mb-4">
                                         <div class="card border-info">
                                             <div class="card-header bg-info text-white">
                                                 <h5 class="mb-0">
-                                                    <i class="fas fa-stream"></i> Distribución por Tipo de Riego
+                                                    <i class="fas fa-stream"></i> Distribución por Tipo de Riego Automatico
                                                 </h5>
                                             </div>
                                             <div class="card-body">
@@ -432,6 +413,25 @@
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Panel de Consumo Total (Centrado y Ampliado) -->
+                                    <div class="row justify-content-center mb-4">
+                                        <div class="col-md-10">
+                                            <div class="card border-success">
+                                                <div class="card-header bg-success text-white text-center">
+                                                    <h4 class="mb-0">
+                                                        <i class="fas fa-water mr-2"></i>Consumo Total
+                                                    </h4>
+                                                </div>
+                                                <div class="card-body text-center py-4">
+                                                    <div class="d-flex justify-content-center">
+                                                        <span id="consumo_agua_total" class="h1 font-weight-bold text-success" style="font-size: 3.5rem; line-height: 1; text-align: center; display: inline-block;">0</span>
+                                                    </div>
+                                                    <p class="text-muted h5 mt-3 mb-0">Litros</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -447,7 +447,7 @@
                                     <i class="fas fa-question-circle"></i> ¿Cómo funciona?
                                 </button>
                                 <button class="btn btn-sm btn-outline-secondary ml-2" onclick="capturarYDescargar('comparativa-historica', 'Reporte_Comparativa_Historica')">
-                                    <i class="fas fa-download"></i> Descargar
+                                    <i class="fas fa-camera"></i> Capturar
                                 </button>
                             </div>
                         </div>
@@ -571,7 +571,7 @@
                                     <i class="fas fa-question-circle"></i> ¿Cómo funciona?
                                 </button>
                                 <button class="btn btn-sm btn-outline-secondary ml-2" onclick="capturarYDescargar('prediccion-agua', 'Reporte_Prediccion_Agua')">
-                                    <i class="fas fa-download"></i> Descargar
+                                    <i class="fas fa-camera"></i> Capturar
                                 </button>
                             </div>
                         </div>
@@ -936,8 +936,7 @@
         
         // Reiniciar valores de consumo de agua
         $('#consumo_agua_total').text('0');
-        $('#val_consumo_valvula').text('0');
-        $('#val_consumo_manual').text('0');
+
         
 
         
@@ -974,14 +973,13 @@
                 // Actualizar consumo de agua total (inicialmente con el valor total)
                 $('#consumo_agua_total').text(parseFloat(data.consumo_agua_total).toFixed(2));
                 
-                // Actualizar consumo de agua por tipo
-                $('#val_consumo_valvula').text(parseFloat(data.consumo_valvula).toFixed(2));
-                $('#val_consumo_manual').text(parseFloat(data.consumo_manual).toFixed(2));
+
                 
                 // Actualizar estado del ciclo y mostrar días restantes o completado
                 if (data.ciclo_completado) {
                     $('#card_dias_restantes').addClass('d-none');
                     $('#card_ciclo_completado').removeClass('d-none');
+                    $('#estado_ciclo_combined').html('<span class="badge badge-success" style="font-size: 1.2rem;">Ciclo completado - Listo para cosecha</span>');
                     $('#estado_ciclo').html('<span class="badge badge-success" style="font-size: 1.2rem;">Ciclo completado - Listo para cosecha</span>');
                 } else {
                     $('#card_dias_restantes').removeClass('d-none');
@@ -990,9 +988,11 @@
                     // Mostrar días restantes si están disponibles
                     if (data.dias_restantes !== null) {
                         $('#dias_restantes').text(data.dias_restantes);
+                        $('#estado_ciclo_combined').html('<span class="badge badge-warning" style="font-size: 1.2rem;">Ciclo en progreso</span>');
                         $('#estado_ciclo').html('<span class="badge badge-warning" style="font-size: 1.2rem;">Ciclo en progreso</span>');
                     } else {
                         $('#dias_restantes').text('N/A');
+                        $('#estado_ciclo_combined').html('<span class="badge badge-info" style="font-size: 1.2rem;">Ciclo en progreso</span>');
                         $('#estado_ciclo').html('<span class="badge badge-info" style="font-size: 1.2rem;">Ciclo en progreso</span>');
                     }
                 }
@@ -1838,13 +1838,15 @@
         <h6>📊 ¿Qué puedes hacer?</h6>
         <ul>
             <li><strong>Seleccionar Ciclos:</strong> Elige cualquier ciclo histórico para analizar</li>
-            <li><strong>Seguimiento de Duración:</strong> Visualiza días transcurridos y restantes</li>
-            <li><strong>Desglose de Riego:</strong> Compara consumo entre riego manual y automatizado</li>
-            <li><strong>Reportes Oficiales:</strong> Genera PDFs con datos consolidados</li>
+            <li><strong>Seguimiento de Duración:</strong> Visualiza días transcurridos y restantes en panel combinado</li>
+            <li><strong>Distribución por Tipo de Riego Automático:</strong> Compara consumo entre riego por goteo (Cama 1) y aspersores (Cama 2)</li>
+            <li><strong>Riego Manual:</strong> Monitorea consumo en Camas 3 y 4</li>
+            <li><strong>Consumo Total:</strong> Panel centrado que muestra el volumen total consumido</li>
+            <li><strong>Capturas de Pantalla:</strong> Guarda imágenes del dashboard con datos consolidados</li>
         </ul>
         <div class="alert alert-info mt-3">
             <i class="fas fa-chart-pie"></i> <strong>Datos Clave:</strong> 
-            Muestra volúmenes totales consumidos y eficiencia del sistema de riego.
+            Muestra volúmenes totales consumidos, eficiencia del sistema de riego y seguimiento del progreso del ciclo.
         </div>
       </div>
       <div class="modal-footer">
@@ -1874,11 +1876,12 @@
             <li><strong>Selección de Ciclos:</strong> Elige dos ciclos históricos para comparar</li>
             <li><strong>Normalización Temporal:</strong> Convierte fechas a "Día del Ciclo" para comparación justa</li>
             <li><strong>Múltiples Gráficas:</strong> Lineal, Barras o Radar según tus necesidades</li>
-            <li><strong>Variables Comparables:</strong> Humedad de camas individuales o consumo total de agua</li>
+            <li><strong>Variables Comparables:</strong> Humedad de camas individuales, consumo total de agua, temperatura y humedad ambiental</li>
+            <li><strong>Filtros Avanzados:</strong> Selecciona tipo de dato y tipo de riego (manual, válvula o ambos)</li>
         </ul>
         <div class="alert alert-info mt-3">
             <i class="fas fa-project-diagram"></i> <strong>Beneficio:</strong> 
-            Identifica qué prácticas fueron más eficientes y replica el éxito.
+            Identifica qué prácticas fueron más eficientes y replica el éxito. Incluye análisis ambiental para contexto completo.
         </div>
       </div>
       <div class="modal-footer">
