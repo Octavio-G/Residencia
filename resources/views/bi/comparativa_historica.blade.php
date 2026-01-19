@@ -49,6 +49,8 @@
                         <option value="humedad_cama1">Humedad Cama 1</option>
                         <option value="humedad_cama2">Humedad Cama 2</option>
                         <option value="consumo_agua">Consumo de Agua</option>
+                        <option value="temperatura">🌡️ Temperatura Ambiental</option>
+                        <option value="humedad_ambiental">💧 Humedad Ambiental</option>
                     </select>
                 </div>
                 <div class="col-md-4" id="tipo_riego_container" style="display: none;">
@@ -58,6 +60,45 @@
                         <option value="valvula">Válvula</option>
                         <option value="ambos">Ambos</option>
                     </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Gráficas Ambientales (siempre visibles) -->
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-thermometer-half"></i> Comportamiento Ambiental</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <h6 class="mb-0"><i class="fas fa-temperature-high"></i> Temperatura</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="graficoTemperatura" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="mb-0"><i class="fas fa-tint"></i> Humedad Ambiental</h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="graficoHumedadAmbiental" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <button type="button" class="btn btn-success" id="btn-comparar-ambiental">
+                        <i class="fas fa-sync-alt"></i> Cargar Datos Ambientales
+                    </button>
+                    <div id="mensaje_ambiental" class="mt-2" style="display: none;"></div>
                 </div>
             </div>
         </div>
@@ -447,6 +488,10 @@
                     titulo += 'Humedad Cama 2';
                 } else if (tipoDato === 'consumo_agua') {
                     titulo += 'Consumo de Agua';
+                } else if (tipoDato === 'temperatura') {
+                    titulo += 'Temperatura Ambiental';
+                } else if (tipoDato === 'humedad_ambiental') {
+                    titulo += 'Humedad Ambiental';
                 }
                 titulo += ' - ' + tipoGrafica.charAt(0).toUpperCase() + tipoGrafica.slice(1);
                 $('#titulo_grafica').text(titulo);
@@ -518,9 +563,344 @@
         compararCiclos();
     });
 
+    // Función para crear gráfica de temperatura ambiental
+    function crearGraficaTemperatura(tempActual, tempAnterior, labels, cicloActualNombre, cicloAnteriorNombre) {
+        console.log('Creando gráfica de temperatura');
+        console.log('Labels:', labels);
+        console.log('Temp Actual:', tempActual);
+        console.log('Temp Anterior:', tempAnterior);
+        
+        var canvas = document.getElementById('graficoTemperatura');
+        if (!canvas) {
+            console.error('Canvas graficoTemperatura no encontrado');
+            return;
+        }
+        
+        var ctx = canvas.getContext('2d');
+        
+        // Destruir gráfica anterior si existe
+        if (window.graficoTemperatura) {
+            window.graficoTemperatura.destroy();
+        }
+        
+        window.graficoTemperatura = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: cicloActualNombre + ' (Actual)',
+                        data: tempActual,
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        tension: 0.1,
+                        pointRadius: 3
+                    },
+                    {
+                        label: cicloAnteriorNombre + ' (Anterior)',
+                        data: tempAnterior,
+                        borderColor: 'rgb(255, 159, 64)',
+                        backgroundColor: 'rgba(255, 159, 64, 0.1)',
+                        tension: 0.1,
+                        pointRadius: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Temperatura Ambiental (°C)'
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Temperatura (°C)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Días del Ciclo'
+                        }
+                    }
+                }
+            }
+        });
+        
+        console.log('Gráfica de temperatura creada exitosamente');
+    }
+    
+    // Función para crear gráfica de humedad ambiental
+    function crearGraficaHumedad(humActual, humAnterior, labels, cicloActualNombre, cicloAnteriorNombre) {
+        console.log('Creando gráfica de humedad');
+        console.log('Labels:', labels);
+        console.log('Hum Actual:', humActual);
+        console.log('Hum Anterior:', humAnterior);
+        
+        var canvas = document.getElementById('graficoHumedadAmbiental');
+        if (!canvas) {
+            console.error('Canvas graficoHumedadAmbiental no encontrado');
+            return;
+        }
+        
+        var ctx = canvas.getContext('2d');
+        
+        // Destruir gráfica anterior si existe
+        if (window.graficoHumedadAmbiental) {
+            window.graficoHumedadAmbiental.destroy();
+        }
+        
+        window.graficoHumedadAmbiental = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: cicloActualNombre + ' (Actual)',
+                        data: humActual,
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        tension: 0.1,
+                        pointRadius: 3
+                    },
+                    {
+                        label: cicloAnteriorNombre + ' (Anterior)',
+                        data: humAnterior,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        tension: 0.1,
+                        pointRadius: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Humedad Ambiental (%)'
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Humedad (%)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Días del Ciclo'
+                        }
+                    }
+                }
+            }
+        });
+        
+        console.log('Gráfica de humedad creada exitosamente');
+    }
+    
+    // Función para comparar datos ambientales
+    function compararAmbiental() {
+        var cicloActual = $('#ciclo_a').val();
+        var cicloAnterior = $('#ciclo_b').val();
+        
+        if (!cicloActual || !cicloAnterior) {
+            $('#mensaje_ambiental').html('<div class="alert alert-warning">Debe seleccionar ambos ciclos para comparar datos ambientales</div>').show();
+            return;
+        }
+        
+        // Mostrar indicador de carga
+        $('#btn-comparar-ambiental').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Cargando Datos Ambientales...');
+        $('#mensaje_ambiental').hide();
+        
+        $.ajax({
+            url: '/bi/comparativa/ambiental',
+            method: 'POST',
+            data: {
+                ciclo_actual: cicloActual,
+                ciclo_anterior: cicloAnterior,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                // Crear las gráficas
+                crearGraficaTemperatura(
+                    response.temp_actual,
+                    response.temp_anterior,
+                    response.labels,
+                    response.ciclo_actual_nombre,
+                    response.ciclo_anterior_nombre
+                );
+                
+                crearGraficaHumedad(
+                    response.hum_actual,
+                    response.hum_anterior,
+                    response.labels,
+                    response.ciclo_actual_nombre,
+                    response.ciclo_anterior_nombre
+                );
+                
+                $('#mensaje_ambiental').html('<div class="alert alert-success">Datos ambientales cargados correctamente</div>').show();
+            },
+            error: function(xhr, status, error) {
+                console.log('Error al cargar datos ambientales:', xhr.responseText);
+                var errorMessage = 'Error al cargar datos ambientales';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMessage = xhr.responseJSON.error;
+                }
+                $('#mensaje_ambiental').html('<div class="alert alert-danger">' + errorMessage + '</div>').show();
+            },
+            complete: function() {
+                // Restaurar botón
+                $('#btn-comparar-ambiental').prop('disabled', false).html('<i class="fas fa-sync-alt"></i> Cargar Datos Ambientales');
+            }
+        });
+    }
+    
+    // Evento para el botón de comparar ambiental
+    $('#btn-comparar-ambiental').click(function() {
+        compararAmbiental();
+    });
+    
+    // Función para crear gráficas iniciales vacías
+    function crearGraficasIniciales() {
+        // Gráfica de temperatura inicial
+        var ctxTemp = document.getElementById('graficoTemperatura').getContext('2d');
+        if (window.graficoTemperatura) {
+            window.graficoTemperatura.destroy();
+        }
+        
+        window.graficoTemperatura = new Chart(ctxTemp, {
+            type: 'line',
+            data: {
+                labels: ['Día 1', 'Día 2', 'Día 3', 'Día 4', 'Día 5'],
+                datasets: [
+                    {
+                        label: 'Ciclo Actual (Seleccione ciclos)',
+                        data: [0, 0, 0, 0, 0],
+                        borderColor: 'rgb(255, 99, 132)',
+                        backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                        tension: 0.1,
+                        pointRadius: 3
+                    },
+                    {
+                        label: 'Ciclo Anterior (Seleccione ciclos)',
+                        data: [0, 0, 0, 0, 0],
+                        borderColor: 'rgb(255, 159, 64)',
+                        backgroundColor: 'rgba(255, 159, 64, 0.1)',
+                        tension: 0.1,
+                        pointRadius: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Temperatura Ambiental (°C)'
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: 'Temperatura (°C)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Días del Ciclo'
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Gráfica de humedad inicial
+        var ctxHum = document.getElementById('graficoHumedadAmbiental').getContext('2d');
+        if (window.graficoHumedadAmbiental) {
+            window.graficoHumedadAmbiental.destroy();
+        }
+        
+        window.graficoHumedadAmbiental = new Chart(ctxHum, {
+            type: 'line',
+            data: {
+                labels: ['Día 1', 'Día 2', 'Día 3', 'Día 4', 'Día 5'],
+                datasets: [
+                    {
+                        label: 'Ciclo Actual (Seleccione ciclos)',
+                        data: [0, 0, 0, 0, 0],
+                        borderColor: 'rgb(54, 162, 235)',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        tension: 0.1,
+                        pointRadius: 3
+                    },
+                    {
+                        label: 'Ciclo Anterior (Seleccione ciclos)',
+                        data: [0, 0, 0, 0, 0],
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                        tension: 0.1,
+                        pointRadius: 3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Humedad Ambiental (%)'
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: 'Humedad (%)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Días del Ciclo'
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
     // Cargar ciclos al cargar la página
     $(document).ready(function() {
         cargarCiclosFinalizados();
+        // Crear gráficas iniciales vacías
+        crearGraficasIniciales();
     });
 </script>
 @endsection

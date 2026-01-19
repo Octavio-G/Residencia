@@ -93,6 +93,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/comparativa/ciclos-finalizados', [ComparativaController::class, 'getCiclosFinalizados']);
         Route::post('/comparativa/comparar', [ComparativaController::class, 'compararCiclos']);
         Route::post('/comparativa/totales', [ComparativaController::class, 'getTotalesCiclos']);
+        Route::post('/comparativa/ambiental', [ComparativaController::class, 'compararAmbiental']);
         
         // Ruta para verificar estructura de tablas
         Route::get('/debug-estructura', function() {
@@ -151,6 +152,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/prediccion-agua-view', [PrediccionAguaController::class, 'index']);
         // Ruta para la API de predicción (AJAX)
         Route::get('/prediccion-agua', [PrediccionAguaController::class, 'predecir']);
+        
+        // Ruta para consumo dividido por tipo de riego
+        Route::get('/consumo-por-tipo-riego', [BiController::class, 'consumoPorTipoRiego']);
+        
+        // Ruta para consumo de riego manual (Camas 3 y 4)
+        Route::get('/consumo-riego-manual', [BiController::class, 'consumoRiegoManual']);
         
 
     });

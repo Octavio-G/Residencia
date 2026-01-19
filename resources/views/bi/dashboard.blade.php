@@ -358,6 +358,80 @@
                                             </div>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Tarjeta de Riego por Tipo -->
+                                    <div class="col-md-12 mb-4">
+                                        <div class="card border-info">
+                                            <div class="card-header bg-info text-white">
+                                                <h5 class="mb-0">
+                                                    <i class="fas fa-stream"></i> Distribución por Tipo de Riego
+                                                </h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6 text-center border-right">
+                                                        <h5 class="text-primary">
+                                                            <i class="fas fa-tint"></i> Riego por Goteo (Cama 1)
+                                                        </h5>
+                                                        <h2 id="riego_goteo" class="display-4 text-primary">0</h2>
+                                                        <p class="text-muted">Litros</p>
+                                                    </div>
+                                                    <div class="col-md-6 text-center">
+                                                        <h5 class="text-success">
+                                                            <i class="fas fa-shower"></i> Riego por Aspersores (Cama 2)
+                                                        </h5>
+                                                        <h2 id="riego_aspersores" class="display-4 text-success">0</h2>
+                                                        <p class="text-muted">Litros</p>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-3">
+                                                    <div class="col-md-12 text-center">
+                                                        <div class="alert alert-secondary">
+                                                            <strong>Total por Tipo de Riego:</strong> 
+                                                            <span id="total_tipo_riego" class="h4">0</span> Litros
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Tarjeta de Riego Manual -->
+                                    <div class="col-md-12 mb-4">
+                                        <div class="card border-warning">
+                                            <div class="card-header bg-warning text-white">
+                                                <h5 class="mb-0">
+                                                    <i class="fas fa-hand-holding-water"></i> Riego Manual (Camas 3 y 4)
+                                                </h5>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-6 text-center border-right">
+                                                        <h5 class="text-warning">
+                                                            <i class="fas fa-hand-holding-water"></i> Cama 3
+                                                        </h5>
+                                                        <h2 id="manual_cama3" class="display-4 text-warning">0</h2>
+                                                        <p class="text-muted">Litros</p>
+                                                    </div>
+                                                    <div class="col-md-6 text-center">
+                                                        <h5 class="text-warning">
+                                                            <i class="fas fa-hand-holding-water"></i> Cama 4
+                                                        </h5>
+                                                        <h2 id="manual_cama4" class="display-4 text-warning">0</h2>
+                                                        <p class="text-muted">Litros</p>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-3">
+                                                    <div class="col-md-12 text-center">
+                                                        <div class="alert alert-secondary">
+                                                            <strong>Total Riego Manual:</strong> 
+                                                            <span id="total_manual" class="h4">0</span> Litros
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -417,6 +491,8 @@
                                                 <option value="humedad_cama1">Humedad Cama 1</option>
                                                 <option value="humedad_cama2">Humedad Cama 2</option>
                                                 <option value="consumo_agua">Consumo de Agua</option>
+                                                <option value="temperatura">Temperatura Ambiental</option>
+                                                <option value="humedad_ambiental">Humedad Ambiental</option>
                                             </select>
                                         </div>
                                         <div class="col-md-4" id="tipo_riego_container" style="display: none;">
@@ -622,6 +698,24 @@
         // Event listener para el botón de cargar datos de ciclos
         $('#btn_cargar_datos').click(function() {
             cargarDatosCiclo();
+            cargarConsumoPorTipoRiego(); // Cargar también el consumo por tipo de riego
+            cargarConsumoRiegoManual(); // Cargar también el consumo de riego manual
+        });
+        
+        // Event listener para cambios en el selector de ciclos
+        $('#ciclo_selector').change(function() {
+            if ($(this).val()) {
+                cargarConsumoPorTipoRiego(); // Cargar consumo cuando cambia el ciclo
+                cargarConsumoRiegoManual(); // Cargar riego manual cuando cambia el ciclo
+            } else {
+                // Limpiar valores si se deselecciona
+                $('#riego_goteo').text('0');
+                $('#riego_aspersores').text('0');
+                $('#total_tipo_riego').text('0');
+                $('#manual_cama3').text('0');
+                $('#manual_cama4').text('0');
+                $('#total_manual').text('0');
+            }
         });
     });
     
@@ -745,6 +839,66 @@
     }
     
 
+    // Función para cargar consumo por tipo de riego
+    function cargarConsumoPorTipoRiego() {
+        var cicloId = $('#ciclo_selector').val();
+        
+        if (!cicloId) {
+            // Limpiar valores si no hay ciclo seleccionado
+            $('#riego_goteo').text('0');
+            $('#riego_aspersores').text('0');
+            $('#total_tipo_riego').text('0');
+            return;
+        }
+        
+        $.ajax({
+            url: '/bi/consumo-por-tipo-riego',
+            method: 'GET',
+            data: { ciclo_id: cicloId },
+            success: function(data) {
+                $('#riego_goteo').text(data.riego_goteo);
+                $('#riego_aspersores').text(data.riego_aspersores);
+                $('#total_tipo_riego').text(data.total_tipo_riego);
+            },
+            error: function(xhr, status, error) {
+                console.log('Error al cargar consumo por tipo de riego:', error);
+                $('#riego_goteo').text('Error');
+                $('#riego_aspersores').text('Error');
+                $('#total_tipo_riego').text('Error');
+            }
+        });
+    }
+    
+    // Función para cargar consumo de riego manual
+    function cargarConsumoRiegoManual() {
+        var cicloId = $('#ciclo_selector').val();
+        
+        if (!cicloId) {
+            // Limpiar valores si no hay ciclo seleccionado
+            $('#manual_cama3').text('0');
+            $('#manual_cama4').text('0');
+            $('#total_manual').text('0');
+            return;
+        }
+        
+        $.ajax({
+            url: '/bi/consumo-riego-manual',
+            method: 'GET',
+            data: { ciclo_id: cicloId },
+            success: function(data) {
+                $('#manual_cama3').text(data.manual_cama3);
+                $('#manual_cama4').text(data.manual_cama4);
+                $('#total_manual').text(data.total_manual);
+            },
+            error: function(xhr, status, error) {
+                console.log('Error al cargar consumo de riego manual:', error);
+                $('#manual_cama3').text('Error');
+                $('#manual_cama4').text('Error');
+                $('#total_manual').text('Error');
+            }
+        });
+    }
+    
     // Función para cargar ciclos de siembra en el selector
     function cargarCiclosSiembraSelector() {
         $.ajax({
@@ -933,6 +1087,10 @@
                     titulo += 'Humedad Cama 2';
                 } else if (tipoDato === 'consumo_agua') {
                     titulo += 'Consumo de Agua';
+                } else if (tipoDato === 'temperatura') {
+                    titulo += '🌡️ Temperatura Ambiental';
+                } else if (tipoDato === 'humedad_ambiental') {
+                    titulo += '💧 Humedad Ambiental';
                 }
                 titulo += ' - ' + tipoGrafica.charAt(0).toUpperCase() + tipoGrafica.slice(1);
                 $('#titulo_grafica').text(titulo);
@@ -1626,6 +1784,7 @@
             });
         }
     }
+
 </script>
 
 <!-- Modal de Ayuda - Indicador de Salud -->

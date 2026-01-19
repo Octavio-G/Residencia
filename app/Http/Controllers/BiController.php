@@ -273,6 +273,74 @@ class BiController extends Controller
     }
 
     /**
+     * Obtener consumo de agua dividido por tipo de riego (Aspersores vs Goteo)
+     */
+    public function consumoPorTipoRiego(Request $request)
+    {
+        $indiceId = $request->input('ciclo_id');
+        
+        if (!$indiceId) {
+            return response()->json([
+                'riego_goteo' => 0,
+                'riego_aspersores' => 0,
+                'total_tipo_riego' => 0
+            ]);
+        }
+        
+        // Obtener el mapeo de la sesión (igual que en datosCiclo)
+        $indiceAMapeo = session('indice_ciclo_mapping', []);
+        
+        // Verificar que el índice exista en el mapeo
+        if (!isset($indiceAMapeo[$indiceId])) {
+            return response()->json(['error' => 'Índice de ciclo no válido'], 400);
+        }
+        
+        // Obtener el ID real del ciclo
+        $cicloIdReal = $indiceAMapeo[$indiceId];
+        
+        // Obtener el ciclo seleccionado
+        $ciclo = CicloSiembra::where('cicloId', $cicloIdReal)->first();
+        if (!$ciclo) {
+            return response()->json(['error' => 'Ciclo no encontrado'], 404);
+        }
+        
+        // --- AQUÍ ESTÁ EL ARREGLO ---
+        // Forzar inicio a las 00:00:00 y fin a las 23:59:59
+        $fechaInicio = Carbon::parse($ciclo->fechaInicio)->startOfDay();
+        $fechaFin = Carbon::parse($ciclo->fechaFin)->endOfDay();
+        
+        // Variable $riegoGoteo (Cama 1): Suma donde cultivoId sea igual a '7523d7e6-ed0c-46df-837e-8f7afd9c037a'
+        $riegoGoteo = Valvula::where('cultivoId', '7523d7e6-ed0c-46df-837e-8f7afd9c037a')
+            ->whereBetween('fechaEncendido', [$fechaInicio, $fechaFin])
+            ->sum('volumen');
+        
+        // Variable $riegoAspersores (Cama 2): Suma donde cultivoId sea igual a '82964903-513d-4c73-891e-f3da0a1cb732'
+        $riegoAspersores = Valvula::where('cultivoId', '82964903-513d-4c73-891e-f3da0a1cb732')
+            ->whereBetween('fechaEncendido', [$fechaInicio, $fechaFin])
+            ->sum('volumen');
+        
+        // Si no hay datos en el periodo exacto, buscar en rango ampliado
+        if ($riegoGoteo == 0 && $riegoAspersores == 0) {
+            $fechaInicioAmpliada = $fechaInicio->copy()->subDays(30);
+            $fechaFinAmpliada = $fechaFin->copy()->addDays(30);
+            
+            $riegoGoteo = Valvula::where('cultivoId', '7523d7e6-ed0c-46df-837e-8f7afd9c037a')
+                ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                ->sum('volumen');
+            
+            $riegoAspersores = Valvula::where('cultivoId', '82964903-513d-4c73-891e-f3da0a1cb732')
+                ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                ->sum('volumen');
+        }
+        
+        return response()->json([
+            'riego_goteo' => round($riegoGoteo, 2),
+            'riego_aspersores' => round($riegoAspersores, 2),
+            'total_tipo_riego' => round($riegoGoteo + $riegoAspersores, 2)
+        ]);
+    }
+    
+    /**
      * Obtener volumen de agua usado en válvulas durante un ciclo de siembra
      */
     public function volumenAguaValvulaCiclo(Request $request)
@@ -325,6 +393,74 @@ class BiController extends Controller
         ]);
     }
 
+    /**
+     * Obtener consumo de agua dividido por riego manual (Camas 3 y 4)
+     */
+    public function consumoRiegoManual(Request $request)
+    {
+        $indiceId = $request->input('ciclo_id');
+        
+        if (!$indiceId) {
+            return response()->json([
+                'manual_cama3' => 0,
+                'manual_cama4' => 0,
+                'total_manual' => 0
+            ]);
+        }
+        
+        // Obtener el mapeo de la sesión (igual que en otras funciones)
+        $indiceAMapeo = session('indice_ciclo_mapping', []);
+        
+        // Verificar que el índice exista en el mapeo
+        if (!isset($indiceAMapeo[$indiceId])) {
+            return response()->json(['error' => 'Índice de ciclo no válido'], 400);
+        }
+        
+        // Obtener el ID real del ciclo
+        $cicloIdReal = $indiceAMapeo[$indiceId];
+        
+        // Obtener el ciclo seleccionado
+        $ciclo = CicloSiembra::where('cicloId', $cicloIdReal)->first();
+        if (!$ciclo) {
+            return response()->json(['error' => 'Ciclo no encontrado'], 404);
+        }
+        
+        // --- AQUÍ ESTÁ EL ARREGLO ---
+        // Forzar inicio a las 00:00:00 y fin a las 23:59:59
+        $fechaInicio = Carbon::parse($ciclo->fechaInicio)->startOfDay();
+        $fechaFin = Carbon::parse($ciclo->fechaFin)->endOfDay();
+        
+        // Variable $manualCama3: Suma donde cultivoId sea '739e342b-9d6a-4dc5-a76d-01db4fdf4b15'
+        $manualCama3 = RiegoManual::where('cultivoId', '739e342b-9d6a-4dc5-a76d-01db4fdf4b15')
+            ->whereBetween('fechaEncendido', [$fechaInicio, $fechaFin])
+            ->sum('volumen');
+        
+        // Variable $manualCama4: Suma donde cultivoId sea '7b81ada6-80a4-4977-9496-23fa853dbdd3'
+        $manualCama4 = RiegoManual::where('cultivoId', '7b81ada6-80a4-4977-9496-23fa853dbdd3')
+            ->whereBetween('fechaEncendido', [$fechaInicio, $fechaFin])
+            ->sum('volumen');
+        
+        // Si no hay datos en el periodo exacto, buscar en rango ampliado
+        if ($manualCama3 == 0 && $manualCama4 == 0) {
+            $fechaInicioAmpliada = $fechaInicio->copy()->subDays(30);
+            $fechaFinAmpliada = $fechaFin->copy()->addDays(30);
+            
+            $manualCama3 = RiegoManual::where('cultivoId', '739e342b-9d6a-4dc5-a76d-01db4fdf4b15')
+                ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                ->sum('volumen');
+            
+            $manualCama4 = RiegoManual::where('cultivoId', '7b81ada6-80a4-4977-9496-23fa853dbdd3')
+                ->whereBetween('fechaEncendido', [$fechaInicioAmpliada, $fechaFinAmpliada])
+                ->sum('volumen');
+        }
+        
+        return response()->json([
+            'manual_cama3' => round($manualCama3, 2),
+            'manual_cama4' => round($manualCama4, 2),
+            'total_manual' => round($manualCama3 + $manualCama4, 2)
+        ]);
+    }
+    
     /**
      * Obtener volumen de agua usado en riego manual durante un ciclo de siembra
      */

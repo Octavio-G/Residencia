@@ -9,6 +9,7 @@ use App\Models\CamaSiembra;  // Esta tabla es cama1
 use App\Models\Cama2;
 use App\Models\Valvula;
 use App\Models\RiegoManual;
+use App\Models\Temperatura;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -180,6 +181,30 @@ class ComparativaController extends Controller
                 $fechaActual->addDay();
                 $dia++;
             }
+        } elseif ($tipoDato === 'temperatura' || $tipoDato === 'humedad_ambiental') {
+            // Obtener datos de temperatura o humedad ambiental
+            $fechaActual = clone $fechaInicio;
+            $dia = 1;
+            
+            while ($fechaActual->lte($fechaFin)) {
+                $fechaStr = $fechaActual->format('Y-m-d');
+                
+                // Obtener promedio diario de temperatura o humedad
+                $campo = $tipoDato === 'temperatura' ? 'temperatura' : 'humedad';
+                
+                $valorPromedio = Temperatura::whereDate('fecha', $fechaStr)
+                    ->whereBetween('fecha', [$ciclo->fechaInicio, $ciclo->fechaFin])
+                    ->avg($campo);
+                
+                $datos[] = [
+                    'dia' => $dia,
+                    'valor' => $valorPromedio !== null ? round($valorPromedio, 2) : 0,
+                    'fecha_registro' => $fechaStr
+                ];
+
+                $fechaActual->addDay();
+                $dia++;
+            }
         }
 
         // Si el ciclo tiene menos de 40 días, rellenar con 0 o null
@@ -248,5 +273,86 @@ class ComparativaController extends Controller
                 ]
             ]
         ]);
+    }
+    
+    /**
+     * Obtener datos ambientales (temperatura y humedad) para comparar ciclos
+     */
+    public function compararAmbiental(Request $request)
+    {
+        $cicloActualId = $request->input('ciclo_actual');
+        $cicloAnteriorId = $request->input('ciclo_anterior');
+        
+        if (!$cicloActualId || !$cicloAnteriorId) {
+            return response()->json(['error' => 'Debe seleccionar ambos ciclos'], 400);
+        }
+        
+        $cicloActual = CicloSiembra::where('cicloId', $cicloActualId)->first();
+        $cicloAnterior = CicloSiembra::where('cicloId', $cicloAnteriorId)->first();
+        
+        if (!$cicloActual || !$cicloAnterior) {
+            return response()->json(['error' => 'Ciclos no encontrados'], 404);
+        }
+        
+        // Obtener datos de temperatura y humedad para cada ciclo
+        $tempActual = $this->obtenerDatosAmbientales($cicloActual, 'temperatura');
+        $tempAnterior = $this->obtenerDatosAmbientales($cicloAnterior, 'temperatura');
+        $humActual = $this->obtenerDatosAmbientales($cicloActual, 'humedad');
+        $humAnterior = $this->obtenerDatosAmbientales($cicloAnterior, 'humedad');
+        
+        // Generar etiquetas basadas en días del ciclo
+        $labels = [];
+        $maxDias = max(count($tempActual), count($tempAnterior), count($humActual), count($humAnterior));
+        
+        for ($i = 1; $i <= $maxDias; $i++) {
+            $labels[] = "Día $i";
+        }
+        
+        return response()->json([
+            'temp_actual' => $tempActual,
+            'temp_anterior' => $tempAnterior,
+            'hum_actual' => $humActual,
+            'hum_anterior' => $humAnterior,
+            'labels' => $labels,
+            'ciclo_actual_nombre' => $cicloActual->descripcion,
+            'ciclo_anterior_nombre' => $cicloAnterior->descripcion
+        ]);
+    }
+    
+    /**
+     * Obtener datos ambientales para un ciclo específico
+     */
+    private function obtenerDatosAmbientales($ciclo, $campo)
+    {
+        // Normalizar fechas
+        $fechaInicio = Carbon::parse($ciclo->fechaInicio);
+        $fechaFin = Carbon::parse($ciclo->fechaFin);
+        
+        $datos = [];
+        $fechaActual = clone $fechaInicio;
+        $dia = 1;
+        
+        while ($fechaActual->lte($fechaFin)) {
+            $fechaStr = $fechaActual->format('Y-m-d');
+            
+            // Obtener promedio del campo (temperatura o humedad) para esta fecha
+            $valor = Temperatura::whereDate('fecha', $fechaStr)
+                ->avg($campo);
+            
+            $datos[] = $valor !== null ? round($valor, 2) : 0;
+            
+            $fechaActual->addDay();
+            $dia++;
+        }
+        
+        // Si el ciclo tiene menos de 40 días, rellenar con 0
+        if (count($datos) < 40) {
+            $diasFaltantes = 40 - count($datos);
+            for ($i = 0; $i < $diasFaltantes; $i++) {
+                $datos[] = 0;
+            }
+        }
+        
+        return $datos;
     }
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Chart.js</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Prueba de Chart.js</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">Gráfica de Prueba</div>
+                    <div class="card-body">
+                        <canvas id="testChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Crear una gráfica de prueba simple
+        var ctx = document.getElementById('testChart').getContext('2d');
+        var testChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Día 1', 'Día 2', 'Día 3', 'Día 4', 'Día 5'],
+                datasets: [{
+                    label: 'Datos de prueba',
+                    data: [12, 19, 3, 5, 2],
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Gráfica de Prueba - Si ves esto, Chart.js funciona'
+                    }
+                }
+            }
+        });
+        
+        console.log('Chart.js version:', Chart.version);
+        console.log('Chart creado:', testChart);
+    </script>
+</body>
+</html>

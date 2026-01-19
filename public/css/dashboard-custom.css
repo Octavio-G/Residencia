@@ -1,0 +1,93 @@
+/* Colores personalizados para los estados de humedad */
+.estado-critico {
+    background-color: #dc3545 !important; /* Rojo bootstrap danger */
+    color: white !important;
+    border: 2px solid #c82333 !important;
+}
+
+.estado-advertencia {
+    background-color: #ffc107 !important; /* Amarillo bootstrap warning */
+    color: black !important;
+    border: 2px solid #d39e00 !important;
+}
+
+.estado-optimo {
+    background-color: #28a745 !important; /* Verde bootstrap success */
+    color: white !important;
+    border: 2px solid #1e7e34 !important;
+}
+
+/* Asegurar que las letras se vean bien en los paneles */
+.card-header.estado-critico {
+    color: rgb(18, 18, 18) !important;
+}
+
+.card-header.estado-advertencia {
+    color: rgb(12, 12, 12) !important;
+}
+
+.card-header.estado-optimo {
+    color: rgb(20, 19, 19) !important;
+}
+
+/* Asegurar que el texto en los badges sea visible */
+.estado-badge.estado-critico {
+    color: rgb(20, 20, 20) !important;
+}
+
+.estado-badge.estado-advertencia {
+    color: black !important;
+}
+
+.estado-badge.estado-optimo {
+    color: rgb(29, 28, 28) !important;
+}
+
+/* Opciones alternativas de colores más profesionales */
+.estado-critico-profesional {
+    background-color: #8B0000 !important; /* Rojo oscuro */
+    color: white !important;
+    border: 1px solid #6B0000 !important;
+}
+
+.estado-advertencia-profesional {
+    background-color: #FF8C00 !important; /* Naranja oscuro */
+    color: white !important;
+    border: 1px solid #CC7000 !important;
+}
+
+.estado-optimo-profesional {
+    background-color: #006400 !important; /* Verde oscuro */
+    color: white !important;
+    border: 1px solid #004A00 !important;
+}
+
+/* Estilos para las tarjetas de estado */
+.estado-badge {
+    padding: 0.5em 0.75em;
+    font-size: 0.8em;
+    font-weight: bold;
+    border-radius: 1rem;
+    text-align: center;
+    display: inline-block;
+    min-width: 60px;
+}
+
+/* Estilos para la tabla de historial */
+.tabla-historial-lecturas .estado-critico {
+    background-color: #f8d7da !important;
+    color: #721c24 !important;
+    border: 1px solid #f5c6cb !important;
+}
+
+.tabla-historial-lecturas .estado-advertencia {
+    background-color: #fff3cd !important;
+    color: #856404 !important;
+    border: 1px solid #ffeaa7 !important;
+}
+
+.tabla-historial-lecturas .estado-optimo {
+    background-color: #d4edda !important;
+    color: #155724 !important;
+    border: 1px solid #c3e6cb !important;
+}
