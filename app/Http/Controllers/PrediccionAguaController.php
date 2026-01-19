@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Valvula;
 use App\Models\RiegoManual;
-use App\Models\Temperatura;
+use App\Models\CamaSiembra;
+use App\Models\Cama2;
 use App\Models\CicloSiembra;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -80,16 +81,38 @@ class PrediccionAguaController extends Controller
                 $promedioDuracion = 40; // Valor por defecto si no hay historial
             }
 
-            // 4. Factor de Ajuste Térmico
-            $ultimaTemperatura = Temperatura::orderBy('fecha', 'desc')->orderBy('hora', 'desc')->first();
-            $temperaturaActual = $ultimaTemperatura ? $ultimaTemperatura->temperatura : 25;
+            // 4. Factor de Ajuste por Humedad del Suelo
+            // Obtener promedio histórico de humedad de ambas camas
+            $ultimaSemana = Carbon::now()->subDays(7);
             
-            // Si hace calor (>25°C), aumentamos la predicción
-            $factorAjuste = 1 + (($temperaturaActual - 25) / 100);
+            $promedioCama1 = CamaSiembra::where('fecha', '>=', $ultimaSemana)
+                ->avg('humedad') ?? 70; // Valor por defecto 70%
+                
+            $promedioCama2 = Cama2::where('fecha', '>=', $ultimaSemana)
+                ->avg('humedad') ?? 70; // Valor por defecto 70%
+            
+            $humedadPromedioCamas = ($promedioCama1 + $promedioCama2) / 2;
+            $humedadIdeal = 70; // 70% es el nivel óptimo
+            
+            // Lógica de compensación inversa basada en eficiencia de humedad
+            if ($humedadPromedioCamas < $humedadIdeal) {
+                // Estaba muy seco, necesitamos más agua
+                $factorCorreccion = 1 + (($humedadIdeal - $humedadPromedioCamas) / 100);
+                // Máximo aumento del 30%
+                $factorCorreccion = min($factorCorreccion, 1.3);
+            } elseif ($humedadPromedioCamas > $humedadIdeal) {
+                // Estaba muy húmedo, podemos ahorrar agua
+                $factorCorreccion = 1 - (($humedadPromedioCamas - $humedadIdeal) / 150);
+                // Mínimo de 70% del consumo original
+                $factorCorreccion = max($factorCorreccion, 0.7);
+            } else {
+                // Humedad ideal, mantener consumo base
+                $factorCorreccion = 1.0;
+            }
             
             // 5. La Gran Fórmula de Predicción
-            // (Promedio Litros/Día) * (Duración Promedio Esperada) * (Factor Calor)
-            $prediccionSiguienteCiclo = ($promedioLitrosDia * $promedioDuracion) * $factorAjuste;
+            // (Promedio Litros/Día) * (Duración Promedio Esperada) * (Factor Humedad)
+            $prediccionSiguienteCiclo = ($promedioLitrosDia * $promedioDuracion) * $factorCorreccion;
 
             // 6. Preparar respuesta para la gráfica
             $labels[] = "Próximo Ciclo (Est. " . round($promedioDuracion) . " días)";
@@ -101,9 +124,10 @@ class PrediccionAguaController extends Controller
                 'labels' => $labels,
                 'data' => $dataGrafica,
                 'prediction' => $prediccionSiguienteCiclo,
-                'temperature' => $temperaturaActual,
-                'promedio_historico' => ($promedioLitrosDia * $promedioDuracion), // Promedio sin ajuste térmico
-                'mensaje' => "Se estima un total de " . number_format($prediccionSiguienteCiclo, 2) . " Litros para el próximo ciclo (duración est. " . round($promedioDuracion) . " días) considerando temperatura de " . $temperaturaActual . "°C."
+                'humedad_promedio' => round($humedadPromedioCamas, 2),
+                'factor_correccion' => round($factorCorreccion, 3),
+                'promedio_historico' => ($promedioLitrosDia * $promedioDuracion), // Promedio sin ajuste
+                'mensaje' => "Se estima un total de " . number_format($prediccionSiguienteCiclo, 2) . " Litros para el próximo ciclo (duración est. " . round($promedioDuracion) . " días) basado en eficiencia de humedad del suelo de " . round($humedadPromedioCamas, 1) . "%."
             ]);
 
         } catch (\Exception $e) {

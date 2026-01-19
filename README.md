@@ -1,13 +1,13 @@
 # Residencia
 proyecto de residencia 
 >>>>>>> c5448460f27523c9c7dd346e2fee7c5f7540ab50
-# HortaView - Sistema de Monitoreo Agrícola
+# HortaDash - Sistema de Monitoreo Agrícola
 
 Sistema de monitoreo agrícola avanzado desarrollado como proyecto de residencia profesional.
 
 ## 🌱 Descripción
 
-HortaView es una plataforma web integral para el monitoreo y gestión de sistemas de riego agrícola. Permite el seguimiento en tiempo real de condiciones del suelo, control de ciclos de siembra y análisis predictivo para optimizar el uso del agua en cultivos.
+HortaDash es una plataforma web integral para el monitoreo y gestión de sistemas de riego agrícola. Permite el seguimiento en tiempo real de condiciones del suelo, control de ciclos de siembra y análisis predictivo para optimizar el uso del agua en cultivos.
 
 ## 🚀 Características Principales
 

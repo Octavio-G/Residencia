@@ -10,7 +10,7 @@ use App\Http\Controllers\PrediccionAguaController;
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 // Rutas de autenticación

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'HortaView')</title>
+    <title>@yield('title', 'HortaDash')</title>
 
     <!-- Fonts -->
     <link rel="stylesheet" href="https://fonts.bunny.net/css2?family=Nunito:wght@400;600;700&display=swap">
@@ -25,7 +25,7 @@
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    <i class="fas fa-seedling"></i> HortaView
+                    <i class="fas fa-seedling"></i> HortaDash
                 </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
                     <span class="navbar-toggler-icon"></span>
@@ -47,7 +47,10 @@
                         @guest
                             @if (Route::has('login'))
                                 <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">Iniciar Sesión</a>
+                                    <a class="nav-link" href="{{ route('login') }}">
+                                        <img src="{{ asset('img/plantita_icono.png') }}" alt="Iniciar Sesión" width="20" height="20" class="d-inline-block align-text-top mr-1">
+                                        Iniciar Sesión
+                                    </a>
                                 </li>
                             @endif
 

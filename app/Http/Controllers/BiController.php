@@ -480,20 +480,20 @@ class BiController extends Controller
         // Si el ciclo ya ha terminado, los días transcurridos son entre inicio y fin
         // Si el ciclo está en curso, los días transcurridos son entre inicio y fecha actual
         if ($ciclo->fechaFin && $fechaFin && $fechaActual->gte($fechaFin)) {
-            // Ciclo completado: calcular días entre inicio y fin
-            $diasTranscurridos = max(0, $fechaInicio->diffInDays($fechaFin));
+            // Ciclo completado: calcular días entre inicio y fin (inclusivo)
+            $diasTranscurridos = (int) max(0, $fechaInicio->diffInDays($fechaFin)) + 1;
         } else {
-            // Ciclo en curso: calcular días entre inicio y fecha actual
-            $diasTranscurridos = max(0, $fechaInicio->diffInDays($fechaActual));
+            // Ciclo en curso: calcular días entre inicio y fecha actual (inclusivo)
+            $diasTranscurridos = (int) max(0, $fechaInicio->diffInDays($fechaActual)) + 1;
         }
         
         // Determinar si el ciclo está completado (basado en fechaFin)
         $cicloCompletado = $fechaFin && $fechaActual->gte($fechaFin);
         
-        // Calcular días restantes si no está completado
+        // Calcular días restantes si no está completado (inclusivo)
         $diasRestantes = null;
         if (!$cicloCompletado && $fechaFin) {
-            $diasRestantes = max(0, $fechaActual->diffInDays($fechaFin));
+            $diasRestantes = (int) max(0, $fechaActual->diffInDays($fechaFin)) + 1;
         }
         
         // Obtener IDs de cultivos asociados al ciclo

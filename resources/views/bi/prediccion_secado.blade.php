@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Predicción de Secado - HortaView')
+@section('title', 'Predicción de Secado - HortaDash')
 
 @section('content')
 <div class="container-fluid">

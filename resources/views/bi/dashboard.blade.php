@@ -43,9 +43,14 @@
                     <div class="card mt-0 border-top-0 rounded-0">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5>Indicador de Salud de Camas de Siembra</h5>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="capturarYDescargar('indicador-salud', 'Reporte_Salud')">
-                                <i class="fas fa-download"></i> Descargar
-                            </button>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm btn-outline-info ml-2" data-toggle="modal" data-target="#modalAyudaSalud">
+                                    <i class="fas fa-question-circle"></i> ¿Cómo funciona?
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary ml-2" onclick="capturarYDescargar('indicador-salud', 'Reporte_Salud')">
+                                    <i class="fas fa-download"></i> Descargar
+                                </button>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="row">
@@ -123,9 +128,14 @@
                     <div class="card mt-0 border-top-0 rounded-0">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5>Índice de Secado</h5>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="capturarYDescargar('indice-secado', 'Reporte_Indice_Secado')">
-                                <i class="fas fa-download"></i> Descargar
-                            </button>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm btn-outline-info ml-2" data-toggle="modal" data-target="#modalAyudaSecado">
+                                    <i class="fas fa-question-circle"></i> ¿Cómo funciona?
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary ml-2" onclick="capturarYDescargar('indice-secado', 'Reporte_Indice_Secado')">
+                                    <i class="fas fa-download"></i> Descargar
+                                </button>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="row mb-4">
@@ -209,9 +219,14 @@
                     <div class="card mt-0 border-top-0 rounded-0">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5>Gestión de Ciclos de Siembra</h5>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="capturarYDescargar('ciclos-siembra', 'Reporte_Ciclos_Siembra')">
-                                <i class="fas fa-download"></i> Descargar
-                            </button>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm btn-outline-info ml-2" data-toggle="modal" data-target="#modalAyudaCiclos">
+                                    <i class="fas fa-question-circle"></i> ¿Cómo funciona?
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary ml-2" onclick="capturarYDescargar('ciclos-siembra', 'Reporte_Ciclos_Siembra')">
+                                    <i class="fas fa-download"></i> Descargar
+                                </button>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="card mb-4">
@@ -353,9 +368,14 @@
                     <div class="card mt-0 border-top-0 rounded-0">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5>Comparativa Histórica de Ciclos de Siembra</h5>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="capturarYDescargar('comparativa-historica', 'Reporte_Comparativa_Historica')">
-                                <i class="fas fa-download"></i> Descargar
-                            </button>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm btn-outline-info ml-2" data-toggle="modal" data-target="#modalAyudaComparativa">
+                                    <i class="fas fa-question-circle"></i> ¿Cómo funciona?
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary ml-2" onclick="capturarYDescargar('comparativa-historica', 'Reporte_Comparativa_Historica')">
+                                    <i class="fas fa-download"></i> Descargar
+                                </button>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="card mb-4">
@@ -470,9 +490,14 @@
                     <div class="card mt-0 border-top-0 rounded-0">
                         <div class="card-header d-flex justify-content-between align-items-center">
                             <h5>Predicción de Consumo de Agua</h5>
-                            <button class="btn btn-sm btn-outline-secondary" onclick="capturarYDescargar('prediccion-agua', 'Reporte_Prediccion_Agua')">
-                                <i class="fas fa-download"></i> Descargar
-                            </button>
+                            <div class="d-flex align-items-center">
+                                <button type="button" class="btn btn-sm btn-outline-info ml-2" data-toggle="modal" data-target="#modalAyudaPrediccion">
+                                    <i class="fas fa-question-circle"></i> ¿Cómo funciona?
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary ml-2" onclick="capturarYDescargar('prediccion-agua', 'Reporte_Prediccion_Agua')">
+                                    <i class="fas fa-download"></i> Descargar
+                                </button>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div class="row mb-3">
@@ -496,8 +521,8 @@
                                                     <p class="text-muted" id="promedio-diario">-</p>
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <h5>Temperatura Actual</h5>
-                                                    <p class="text-muted" id="temperatura-actual">-</p>
+                                                    <h5>Humedad del Suelo</h5>
+                                                    <p class="text-muted" id="humedad-promedio">-</p>
                                                 </div>
                                                 <div class="col-md-4">
                                                     <h5>Predicción</h5>
@@ -553,6 +578,25 @@
         
         // Cargar historial de lecturas al inicio
         cargarHistorialLecturas();
+        
+        // --- PERSISTENCIA DE PESTAÑAS (Memory Fix) ---
+        
+        // 1. Al cargar la página: ¿Tengo una pestaña guardada?
+        var activeTab = localStorage.getItem('bi_active_tab');
+        if (activeTab) {
+            // Busca el link que apunta a ese ID y actívalo
+            // Nota: Esto disparará el evento 'shown.bs.tab' automáticamente
+            $('#biTabs a[href="' + activeTab + '"]').tab('show');
+        }
+
+        // 2. Al hacer clic en una pestaña: Guardar en memoria
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var targetId = $(e.target).attr('href'); // El ID de la pestaña activada (ej: #ciclos)
+            localStorage.setItem('bi_active_tab', targetId);
+            
+            // (Tu lógica existente de limpieza visual puede seguir aquí)
+            console.log("Pestaña guardada: " + targetId);
+        });
         
         // Event listeners para filtros de historial
         $('#form-filtros-historial').submit(function(e) {
@@ -1135,6 +1179,26 @@
         compararCiclos();
     }
     
+    // Validación para evitar seleccionar el mismo ciclo
+    $('#ciclo_a, #ciclo_b').change(function() {
+        var cicloA = $('#ciclo_a').val();
+        var cicloB = $('#ciclo_b').val();
+        var btnComparar = $('#btn-comparar-completo');
+        var panelError = $('#panel_mensajes_comparativa');
+        var msgError = $('#mensaje_error_comparativa');
+
+        // Limpiar error previo
+        panelError.hide();
+        btnComparar.prop('disabled', false);
+
+        // Validar si son iguales y no están vacíos
+        if (cicloA && cicloB && cicloA === cicloB) {
+            msgError.text("⚠️ No puedes comparar el mismo ciclo. Por favor selecciona dos distintos.");
+            panelError.show();
+            btnComparar.prop('disabled', true); // Bloquear botón
+        }
+    });
+    
     // Evento para activar pestaña de comparativa histórica
     $('#comparativa-historica-tab').on('shown.bs.tab', function (e) {
         cargarCiclosFinalizados();
@@ -1156,10 +1220,17 @@
                 
                 // Formatear tiempo restante para Cama 1
                 let tiempoCama1 = '';
-                if (data.cama1.tiempo_restante.horas > 0) {
-                    tiempoCama1 = data.cama1.tiempo_restante.horas + 'h ';
+                if (data.cama1.tiempo_restante.total_minutos <= 0) {
+                    // Caso crítico: estrés hídrico alcanzado
+                    tiempoCama1 = '0';
+                    $('#cama1-tiempo-restante').removeClass('text-success text-white blink').addClass('text-danger');
+                } else {
+                    // Tiempo normal
+                    if (data.cama1.tiempo_restante.horas > 0) {
+                        tiempoCama1 = data.cama1.tiempo_restante.horas + 'h ';
+                    }
+                    tiempoCama1 += data.cama1.tiempo_restante.minutos + 'm';
                 }
-                tiempoCama1 += data.cama1.tiempo_restante.minutos + 'm';
                 
                 $('#cama1-tiempo-restante').text(tiempoCama1);
                 
@@ -1186,10 +1257,17 @@
                 
                 // Formatear tiempo restante para Cama 2
                 let tiempoCama2 = '';
-                if (data.cama2.tiempo_restante.horas > 0) {
-                    tiempoCama2 = data.cama2.tiempo_restante.horas + 'h ';
+                if (data.cama2.tiempo_restante.total_minutos <= 0) {
+                    // Caso crítico: estrés hídrico alcanzado
+                    tiempoCama2 = '0';
+                    $('#cama2-tiempo-restante').removeClass('text-success text-white blink').addClass('text-danger');
+                } else {
+                    // Tiempo normal
+                    if (data.cama2.tiempo_restante.horas > 0) {
+                        tiempoCama2 = data.cama2.tiempo_restante.horas + 'h ';
+                    }
+                    tiempoCama2 += data.cama2.tiempo_restante.minutos + 'm';
                 }
-                tiempoCama2 += data.cama2.tiempo_restante.minutos + 'm';
                 
                 $('#cama2-tiempo-restante').text(tiempoCama2);
                 
@@ -1354,7 +1432,7 @@
             
             document.getElementById('mensaje-prediccion').textContent = data.mensaje;
             document.getElementById('promedio-diario').textContent = data.promedio_historico.toFixed(2) + ' L';
-            document.getElementById('temperatura-actual').textContent = data.temperature + '°C';
+            document.getElementById('humedad-promedio').textContent = data.humedad_promedio + '% (Factor: ' + data.factor_correccion + ')';
             document.getElementById('prediccion-valor').textContent = data.prediction.toFixed(2) + ' L';
             
             actualizarGraficaPrediccion(data.labels, data.data);
@@ -1549,4 +1627,173 @@
         }
     }
 </script>
+
+<!-- Modal de Ayuda - Indicador de Salud -->
+<div class="modal fade" id="modalAyudaSalud" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title"><i class="fas fa-heartbeat"></i> Indicador de Salud</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-justify">
+            Este módulo monitorea en tiempo real el estado de salud de tus camas de cultivo mediante sensores de humedad del suelo.
+        </p>
+        <hr>
+        <h6>📊 ¿Qué monitoriza?</h6>
+        <ul>
+            <li><strong>Humedad del Suelo:</strong> Nivel actual de humedad en porcentaje para cada cama</li>
+            <li><strong>Temperatura Ambiental:</strong> Temperatura actual del ambiente</li>
+            <li><strong>Sistema de Alertas:</strong> Indicadores de color (🟢 Óptimo, 🟡 Advertencia, 🔴 Crítico)</li>
+        </ul>
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-lightbulb"></i> <strong>Consejo:</strong> 
+            El historial de lecturas te permite analizar tendencias y patrones en el tiempo.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Entendido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Ayuda - Gestión de Ciclos -->
+<div class="modal fade" id="modalAyudaCiclos" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title"><i class="fas fa-calendar-alt"></i> Gestión de Ciclos</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-justify">
+            Esta herramienta te permite gestionar y analizar el consumo de agua durante los ciclos de siembra completados.
+        </p>
+        <hr>
+        <h6>📊 ¿Qué puedes hacer?</h6>
+        <ul>
+            <li><strong>Seleccionar Ciclos:</strong> Elige cualquier ciclo histórico para analizar</li>
+            <li><strong>Seguimiento de Duración:</strong> Visualiza días transcurridos y restantes</li>
+            <li><strong>Desglose de Riego:</strong> Compara consumo entre riego manual y automatizado</li>
+            <li><strong>Reportes Oficiales:</strong> Genera PDFs con datos consolidados</li>
+        </ul>
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-chart-pie"></i> <strong>Datos Clave:</strong> 
+            Muestra volúmenes totales consumidos y eficiencia del sistema de riego.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Entendido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Ayuda - Comparativa Histórica -->
+<div class="modal fade" id="modalAyudaComparativa" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title"><i class="fas fa-balance-scale"></i> Comparativa Histórica</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-justify">
+            Compara el rendimiento de dos ciclos de siembra diferentes para identificar patrones y áreas de mejora.
+        </p>
+        <hr>
+        <h6>📊 ¿Cómo funciona?</h6>
+        <ul>
+            <li><strong>Selección de Ciclos:</strong> Elige dos ciclos históricos para comparar</li>
+            <li><strong>Normalización Temporal:</strong> Convierte fechas a "Día del Ciclo" para comparación justa</li>
+            <li><strong>Múltiples Gráficas:</strong> Lineal, Barras o Radar según tus necesidades</li>
+            <li><strong>Variables Comparables:</strong> Humedad de camas individuales o consumo total de agua</li>
+        </ul>
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-project-diagram"></i> <strong>Beneficio:</strong> 
+            Identifica qué prácticas fueron más eficientes y replica el éxito.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Entendido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Ayuda - Predicción de Agua -->
+<div class="modal fade" id="modalAyudaPrediccion" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title"><i class="fas fa-tint"></i> Predicción de Consumo</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-justify">
+            Predice cuánta agua necesitarás para el próximo ciclo de riego basándote en datos históricos y la eficiencia de humedad del suelo.
+        </p>
+        <hr>
+        <h6>📊 ¿Qué analiza?</h6>
+        <ul>
+            <li><strong>Consumo Histórico:</strong> Promedio diario de ciclos anteriores completados</li>
+            <li><strong>Eficiencia de Humedad:</strong> Factor de corrección basado en humedad promedio de las camas (70% es el nivel ideal)</li>
+            <li><strong>Tipos de Riego:</strong> Análisis separado para válvula, manual o total</li>
+            <li><strong>Visualización Clara:</strong> Gráfica con punto de predicción destacado</li>
+        </ul>
+        <div class="alert alert-info mt-3">
+            <i class="fas fa-calculator"></i> <strong>Lógica de Compensación:</strong> 
+            Si la humedad promedio fue < 70%, aumenta la predicción. Si fue > 70%, la disminuye.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Entendido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Ayuda - Índice de Secado -->
+<div class="modal fade" id="modalAyudaSecado" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-info text-white">
+        <h5 class="modal-title"><i class="fas fa-info-circle"></i> Índice de Secado</h5>
+        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-justify">
+            Este módulo es una herramienta predictiva que responde a la pregunta: 
+            <strong>"¿Cuánto tiempo falta para el próximo riego?"</strong>
+        </p>
+        <hr>
+        <h6>📊 ¿Cómo se calcula?</h6>
+        <ul>
+            <li><strong>Análisis de Tendencia:</strong> El sistema calcula la velocidad a la que el suelo pierde humedad basándose en las últimas 48 horas.</li>
+            <li><strong>Factor Térmico:</strong> Si la temperatura supera los 25°C, el modelo ajusta la predicción asumiendo una evaporación más rápida.</li>
+        </ul>
+        <div class="alert alert-light border-danger text-danger mt-3">
+            <i class="fas fa-exclamation-triangle"></i> <strong>Punto Crítico:</strong> 
+            La línea punteada roja en la gráfica muestra la proyección futura. Cuando esta línea toca el fondo (30%), el cultivo entra en estrés hídrico.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Entendido</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 @endsection

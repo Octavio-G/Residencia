@@ -5,7 +5,7 @@
     <div class="row">
         <div class="col-12">
             <h2>Predicción de Consumo de Agua</h2>
-            <p class="text-muted">Sistema de predicción basado en regresión lineal y temperatura actual</p>
+            <p class="text-muted">Sistema de predicción basado en regresión lineal y eficiencia de humedad del suelo</p>
         </div>
     </div>
 
@@ -32,8 +32,8 @@
                             <p class="text-muted" id="promedio-diario">-</p>
                         </div>
                         <div class="col-md-4">
-                            <h5>Temperatura Actual</h5>
-                            <p class="text-muted" id="temperatura-actual">-</p>
+                            <h5>Eficiencia de Humedad</h5>
+                            <p class="text-muted" id="humedad-promedio">-</p>
                         </div>
                         <div class="col-md-4">
                             <h5>Predicción</h5>
@@ -75,8 +75,8 @@
         .then(data => {
             // Actualizar panel de resumen
             document.getElementById('mensaje-prediccion').textContent = data.mensaje;
-            document.getElementById('promedio-diario').textContent = data.promedio_diario.toFixed(2) + ' L';
-            document.getElementById('temperatura-actual').textContent = data.temperature + '°C';
+            document.getElementById('promedio-diario').textContent = data.promedio_historico.toFixed(2) + ' L';
+            document.getElementById('humedad-promedio').textContent = data.humedad_promedio + '% (Factor: ' + data.factor_correccion + ')';
             document.getElementById('prediccion-valor').textContent = data.prediction.toFixed(2) + ' L';
             
             // Actualizar gráfica
